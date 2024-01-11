@@ -1,6 +1,7 @@
-import { Box, Card, CardContent, Divider, Typography } from "@mui/material"
+import { Box, Card, CardContent, Divider, Skeleton, Typography } from "@mui/material"
 
-const AttendanceRecapCard = () => {
+// eslint-disable-next-line react/prop-types
+const AttendanceRecapCard = ({ loading = false, label }) => {
     return (
         <Card sx={{ mb: 2 }}>
             <CardContent>
@@ -8,18 +9,18 @@ const AttendanceRecapCard = () => {
                 <Box sx={{ my: 2 }}>
                     <Box sx={{ display: 'flex', bgcolor: 'grey', my: 1, py: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography>15 Asisten</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `15 ${label}`}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography >Hadir</Typography>
+                            <Typography >{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : 'Hadir'}</Typography>
                         </Box>
                     </Box>
                     <Box sx={{ display: 'flex', bgcolor: 'grey', my: 1, py: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography>15 Asisten</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `15 ${label}`}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography >Tidak Hadir</Typography>
+                            <Typography >{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : 'Tidak Hadir'}</Typography>
                         </Box>
                     </Box>
                 </Box>
@@ -27,18 +28,18 @@ const AttendanceRecapCard = () => {
                 <Box sx={{ my: 2 }}>
                     <Box sx={{ display: 'flex', bgcolor: 'grey', my: 1, py: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography>15 Asisten</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `15 ${label}`}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography >Tepat Waktu</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : 'Tepat Waktu'}</Typography>
                         </Box>
                     </Box>
                     <Box sx={{ display: 'flex', bgcolor: 'grey', my: 1, py: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography>15 Asisten</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `15 ${label}`}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography >Terlambat</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : 'Terlambat'}</Typography>
                         </Box>
                     </Box>
                 </Box>

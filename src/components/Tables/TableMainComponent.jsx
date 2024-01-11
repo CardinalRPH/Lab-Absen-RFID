@@ -1,6 +1,6 @@
 import { faPenToSquare, faTrash, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, Button, Checkbox, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, TextField, Toolbar, Typography, alpha } from "@mui/material";
+import { Box, Button, Checkbox, ListItemIcon, ListItemText, Menu, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, TextField, Toolbar, Typography, alpha } from "@mui/material";
 import { useMemo, useState } from "react";
 
 /* eslint-disable no-undef */
@@ -298,7 +298,6 @@ const TableMainComponent = ({ handler }) => {
 
     return (
         <Box sx={{ width: '100%', margin: 2 }}>
-            <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar
                     searchChange={handleSearchChange}
                     numSelected={selected.length}
@@ -385,7 +384,6 @@ const TableMainComponent = ({ handler }) => {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-            </Paper>
             <Menu
                 anchorOrigin={pointerPosition ? { vertical: pointerPosition.y, horizontal: pointerPosition.x } : undefined}
                 open={Boolean(pointerPosition)}

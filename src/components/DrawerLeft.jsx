@@ -3,7 +3,8 @@ import { faCalendarCheck, faCalendarMinus, faCubes, faLanguage, faMoon, faQrcode
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Avatar, Box, Collapse, Container, Divider, Drawer, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from "@mui/material"
 import { Fragment, useState } from "react"
-import { useThemeState } from "../hooks/ThemeState"
+import { useDispatch, useSelector } from "react-redux"
+import { themeAction } from "../stores/themeState"
 
 const pages = [
     {
@@ -14,16 +15,7 @@ const pages = [
     {
         name: 'Asisten',
         icon: faUsers,
-        child: [
-            {
-                name: 'Calon Asisten',
-                link: '/calas'
-            },
-            {
-                name: 'Asisten Aktif',
-                link: '/asisten'
-            }
-        ]
+        link: '/asisten'
     },
     {
         name: 'Presensi Asisten',
@@ -45,7 +37,8 @@ const pages = [
 const DrawerLeft = ({ drawerStates }) => {
     const [collapseState, setCollapseState] = useState(null)
     const { drawerState = false, toggleDrawer } = drawerStates
-    const { setIsDarkMode, isDarkMode } = useThemeState()
+    const dispatch = useDispatch()
+    const { isDarkMode } = useSelector(state => state.themes)
 
     const handleCollapseOpen = (name) => {
         collapseState ? setCollapseState(null) : setCollapseState(name)
@@ -128,7 +121,7 @@ const DrawerLeft = ({ drawerStates }) => {
                                 </ListItemButton>
                             </ListItem>
                             <ListItem>
-                                <ListItemButton onClick={() => setIsDarkMode(!isDarkMode)}>
+                                <ListItemButton onClick={() => dispatch(themeAction.setDarkMode(!isDarkMode))}>
                                     <ListItemIcon>
                                         <FontAwesomeIcon size="xl" icon={isDarkMode ? faSun : faMoon} />
                                     </ListItemIcon>

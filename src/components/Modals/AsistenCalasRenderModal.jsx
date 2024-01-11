@@ -27,7 +27,7 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
     }
 
     const handleInputChange = (event) => {
-        setInputForm((prevState) => ({
+        setInputForm(prevState => ({
             ...prevState,
             [event.target.name]: event.target.value
         }))
@@ -68,7 +68,7 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [purpose])
     return (
-        <Box component={purpose === 'view' ? undefined : 'form'}>
+        <Box component={purpose === 'view' ? undefined : 'form'} onSubmit={(event) => purpose === 'add' ? handleSaveData(event) : handleEditData(event, inputForm.nim)}>
             <Box sx={{ display: 'flex', minWidth: { xs: 'auto', md: 800 }, my: 1 }}>
                 <Box sx={{ width: '50%', display: 'flex', flexDirection: 'column', mr: 2 }}>
                     <TextField value={inputForm.nim} name="nim" sx={{ my: 1 }} onChange={handleInputNumber} id="standard-basic" label="NIM" variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
@@ -77,7 +77,7 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
                 </Box>
                 <Box sx={{ width: '50%', display: 'flex', flexDirection: 'column', ml: 2 }}>
                     <TextField name="name" onChange={handleInputChange} value={inputForm.name} sx={{ my: 1 }} id="standard-basic" label="Nama Lengkap" variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
-                    <FormControl sx={{ my: 1 }} required>
+                    <FormControl sx={{ my: 1 }}>
                         <FormLabel id='radio-buttons-group-label'>Jenis Kelamin</FormLabel>
                         <RadioGroup
                             row
@@ -86,8 +86,8 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
                             value={inputForm.gender}
                             onChange={handleInputChange}
                             defaultValue='laki-laki'>
-                            <FormControlLabel value="laki-laki" control={<Radio />} label="Laki-laki" disabled={readOnlyInput} />
-                            <FormControlLabel value="perempuan" control={<Radio />} label="Perempuan" disabled={readOnlyInput} />
+                            <FormControlLabel value="laki-laki" control={<Radio />} label="Laki-laki" disabled={readOnlyInput} required />
+                            <FormControlLabel value="perempuan" control={<Radio />} label="Perempuan" disabled={readOnlyInput} required />
                         </RadioGroup>
                     </FormControl>
                     {inputForm.position !== 'calonAsisten' && (
@@ -135,14 +135,14 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
                 {purpose === 'edit' && (
                     <>
                         <Button variant="contained" sx={{ mx: 1 }} onClick={() => setPurpose('view')} >Batal</Button>
-                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleEditData(inputForm.nim)}>Simpan Ubah</Button>
+                        <Button variant="contained" sx={{ mx: 1 }} type="submit" >Simpan Ubah</Button>
 
                     </>
                 )}
                 {purpose === 'add' && (
                     <>
                         <Button variant="contained" sx={{ mx: 1 }} onClick={() => modalSeter(false)} >Batal</Button>
-                        <Button variant="contained" sx={{ mx: 1 }} onClick={handleSaveData}>Simpan</Button>
+                        <Button variant="contained" type="submit" sx={{ mx: 1 }}>Simpan</Button>
                     </>
                 )}
             </Box>

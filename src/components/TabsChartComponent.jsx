@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
-import { Box, CircularProgress, Tab, Tabs, Typography } from "@mui/material"
+import { Box, Tab, Tabs, Typography } from "@mui/material"
 import { BarChart, PieChart } from "@mui/x-charts";
 import { useState } from "react";
+import RootLoading from "./RootLoading";
 
 const CustomTabPanel = (props) => {
     const { children, value, index, ...other } = props;
@@ -42,16 +43,6 @@ const barChartSetting = {
 };
 const valueFormatter = (value) => `${value} Asisten`;
 
-const renderLoading = () => {
-    return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', minHeight: 300 }}>
-            <CircularProgress size={80} />
-        </Box>
-    )
-}
-
-
-
 const TabsChartComponent = ({ data, loading }) => {
 
     const [value, setValue] = useState(0);
@@ -61,7 +52,7 @@ const TabsChartComponent = ({ data, loading }) => {
     };
     return (
         <Box sx={{ width: '100%' }}>
-            {loading ? renderLoading() : (
+            {loading ? (<RootLoading />) : (
                 <>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs centered value={value} onChange={handleChange} aria-label="basic tabs example">
