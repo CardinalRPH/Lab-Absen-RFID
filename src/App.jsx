@@ -1,12 +1,13 @@
 import { RouterProvider } from "react-router-dom"
 import AppRouter from "./routes/router"
-import { ThemeStateProvider } from "./hooks/ThemeState"
+import { Provider } from "react-redux"
+import store from "./stores"
 function App() {
 
   return (
-    <ThemeStateProvider>
+    <Provider store={store}>
       <RouterProvider router={AppRouter} />
-    </ThemeStateProvider>
+    </Provider>
   )
 }
 

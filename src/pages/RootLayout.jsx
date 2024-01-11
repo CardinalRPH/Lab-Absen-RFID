@@ -2,19 +2,15 @@ import { useEffect, useState } from "react"
 import DrawerLeft from "../components/DrawerLeft"
 import Header from "../components/Header"
 import { Outlet } from "react-router-dom"
-import { useThemeState } from "../hooks/ThemeState"
 import { ThemeProvider } from "@mui/material"
 import { darkTheme, lightTheme } from "../utilities/themePelette"
+import { useSelector } from "react-redux"
 
 const RootLayout = () => {
     const [drawerState, setDrawerState] = useState(false)
-    const { isDarkMode } = useThemeState()
+    const { isDarkMode } = useSelector(state => state.themes)
 
     const toggleDrawer = (state) => {
-        // if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-        //     return;
-        // }
-
         setDrawerState(state)
     }
     useEffect(() => {

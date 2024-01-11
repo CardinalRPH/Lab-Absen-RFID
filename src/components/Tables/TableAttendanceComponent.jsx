@@ -150,7 +150,8 @@ const EnhancedTableHead = (props) => {
     );
 }
 
-const TableAttendanceComponent = () => {
+// eslint-disable-next-line react/prop-types
+const TableAttendanceComponent = ({ handleRowClick, handleHomewardData }) => {
     const [selected, setSelected] = useState([]);
     const [tempData, setTempData] = useState(rows)
     const [order, setOrder] = useState('asc');
@@ -241,7 +242,7 @@ const TableAttendanceComponent = () => {
                 searchChange={handleSearchChange}
                 numSelected={selected.length}
                 selected={selected}
-                handleHomewardData={{}}
+                handleHomewardData={handleHomewardData}
             />
             <TableContainer>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -260,6 +261,7 @@ const TableAttendanceComponent = () => {
                             return (
                                 <TableRow
                                     hover
+                                    onClick={() => handleRowClick(row.id)}
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     key={row.id}

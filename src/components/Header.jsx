@@ -12,16 +12,7 @@ const pages = [
     {
         name: 'Asisten',
         icon: faUsers,
-        child: [
-            {
-                name: 'Calon Asisten',
-                link: '/calas'
-            },
-            {
-                name: 'Asisten Aktif',
-                link: '/asisten'
-            }
-        ]
+        link: '/asisten'
     },
     {
         name: 'Presensi Asisten',

@@ -2,7 +2,6 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import RootLayout from "../pages/RootLayout";
 import HomePage from "../pages/HomePage";
 import AssistantPage from "../pages/AssistantPage";
-import CALASPage from "../pages/CALASPage";
 import AssistantAttendancePage from "../pages/AssistantAttendancePage";
 import CALASAttendancePage from "../pages/CALASAttendancePage";
 
@@ -26,10 +25,6 @@ const AppRouter = createBrowserRouter([
             {
                 path: 'asisten',
                 element: <AssistantPage />
-            },
-            {
-                path: 'calas',
-                element: <CALASPage />
             },
             {
                 path: 'presensi',

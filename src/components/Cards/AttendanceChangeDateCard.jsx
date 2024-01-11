@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Box, Card, CardContent, Typography } from "@mui/material"
-import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers"
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import MobileDPicker from "../DateAndTime/MobileDPicker"
 
 const AttendanceChangeDateCard = ({ currDate, handleChangeDate }) => {
     const { dateValue } = currDate
@@ -10,15 +9,12 @@ const AttendanceChangeDateCard = ({ currDate, handleChangeDate }) => {
             <CardContent>
                 <Typography>Ganti Tanggal Presensi</Typography>
                 <Box sx={{ my: 2, display: 'flex', justifyContent: 'center' }}>
-                    <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="en-gb">
-                        <MobileDatePicker
-                            label='Ganti Tanggal'
-                            format="DD/MM/YYYY"
-                            disableFuture
-                            onAccept={handleChangeDate}
-                            value={dateValue}
-                        />
-                    </LocalizationProvider>
+                    <MobileDPicker
+                        dateValue={dateValue}
+                        handleChangeDate={handleChangeDate}
+                        disableFuture={true}
+                        label='Ganti Tanggal'
+                    />
                 </Box>
 
             </CardContent>
