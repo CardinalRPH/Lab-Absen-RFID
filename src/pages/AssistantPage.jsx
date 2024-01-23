@@ -2,12 +2,13 @@ import { Box, Button, Card, CardContent, Container, Skeleton, Typography, } from
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import ModalMain from "../components/Modals/MdalMain";
+import ModalMain from "../components/Modals/ModalMain";
 import AsistenCalasRenderModal from "../components/Modals/AsistenCalasRenderModal";
 import TableMainComponent from "../components/Tables/TableMainComponent";
 import DialogAlertMain from "../components/DialogAlertMain";
-import AlertMain from "../components/AlertMain.jSX";
 import RootLoading from "../components/RootLoading";
+import { useSelector } from "react-redux";
+import { enLang, idLang } from "../utilities/LanguageTextConfig";
 
 //todo
 //add Loading
@@ -20,6 +21,8 @@ const AssistantPage = () => {
     const [modalTitle, setModalTitle] = useState('')
     const [dialogOpen, setDialogOpen] = useState(false)
     const [dialogTitle, setDialogTitle] = useState('')
+    const { isEnLang } = useSelector(state => state.languages)
+    const language = isEnLang ? enLang : idLang
     const [loading, setLoading] = useState(false)
     const [inputForm, setInputForm] = useState({
         nim: '',
@@ -33,14 +36,14 @@ const AssistantPage = () => {
     })
 
     const handleRowClick = (rowId) => {
-        setModalTitle('Data Asisten')
+        setModalTitle(language?.dataAsistant)
         setRenderModalPurpose('view')
         setModalOpen(true)
         console.log(rowId);
     }
 
     const handleAddModalOpen = () => {
-        setModalTitle('Tambah Asisten Baru')
+        setModalTitle(language?.addMoreAssistant)
         setRenderModalPurpose('add')
         setModalOpen(true)
     }
@@ -56,7 +59,7 @@ const AssistantPage = () => {
     }
 
     const handleEditOpenModal = (id) => {
-        setModalTitle('Ubah Asisten Data')
+        setModalTitle(language?.changeAssistantData)
         setRenderModalPurpose('edit')
         setModalOpen(true)
         console.log(id);
@@ -65,7 +68,7 @@ const AssistantPage = () => {
 
     const handleDisableData = (multiData, singleData) => {
         setDialogOpen(true)
-        setDialogTitle('Nonaktifkan')
+        setDialogTitle(language?.disableIt)
         if (multiData) {
             console.log(multiData);
             //handle multiple data
@@ -78,7 +81,7 @@ const AssistantPage = () => {
 
     const handleDeleteData = (multiData, singleData) => {
         setDialogOpen(true)
-        setDialogTitle('Hapus')
+        setDialogTitle(language?.delete)
         if (multiData) {
             console.log(multiData);
             //handle multiple data
@@ -97,18 +100,18 @@ const AssistantPage = () => {
     }
 
     useEffect(() => {
-        document.title = 'Boo'
-    }, [])
+        document.title = `${language?.assistant} - Lab ICT Presensi`
+    }, [language?.assistant])
 
     return (
         <>
-            <Container sx={{ my: 5 }}>
+            <Container sx={{ py: 5, minHeight: '91.5vh' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
                     <Button sx={{ mx: 1, }} variant="contained" onClick={() => loading == false && handleAddModalOpen()}>
                         {loading ? (<Skeleton sx={{ minWidth: 200 }} />) : (
                             <>
                                 <FontAwesomeIcon size="lg" icon={faPlus} />
-                                <Typography sx={{ mx: 1 }}>Tambah Asisten Baru</Typography>
+                                <Typography sx={{ mx: 1 }}>{language?.addMoreAssistant}</Typography>
                             </>
                         )}
                     </Button>
@@ -116,7 +119,7 @@ const AssistantPage = () => {
                 <Card>
                     <CardContent>
                         {loading ? (<RootLoading />) : (
-                            <TableMainComponent handler={{ handleRowClick, handleDeleteData, handleDisableData, handleEditOpenModal, handleSaveData }} />
+                            <TableMainComponent language={language} handler={{ handleRowClick, handleDeleteData, handleDisableData, handleEditOpenModal, handleSaveData }} />
                         )}
                     </CardContent>
                 </Card>
@@ -127,6 +130,7 @@ const AssistantPage = () => {
                 modalTitle={modalTitle}
             >
                 <AsistenCalasRenderModal
+                    language={language}
                     purposer={renderModalPurpose}
                     modalSeter={setModalOpen}
                     inputForm={inputForm}
@@ -147,8 +151,6 @@ const AssistantPage = () => {
                 lalalala
 
             </DialogAlertMain>
-            <AlertMain
-            />
         </>
     )
 }

@@ -4,6 +4,10 @@ import HomePage from "../pages/HomePage";
 import AssistantPage from "../pages/AssistantPage";
 import AssistantAttendancePage from "../pages/AssistantAttendancePage";
 import CALASAttendancePage from "../pages/CALASAttendancePage";
+import ExportPriviewPage from "../pages/ExportPriviewPage";
+import RFIDDevicesPage from "../pages/RFIDDevicesPage";
+import AuthGuard from "../services/AuthGuard";
+import AbsentPage from "../pages/AbsentPage";
 
 const AppRouter = createBrowserRouter([
     {
@@ -15,16 +19,31 @@ const AppRouter = createBrowserRouter([
         element: <Navigate to='/presensi/asisten' replace />
     },
     {
-        path: '/',
         element: <RootLayout />,
         children: [
             {
                 path: 'home',
-                element: <HomePage />
+                element: <AuthGuard>
+                    <HomePage />
+                </AuthGuard>
             },
             {
                 path: 'asisten',
-                element: <AssistantPage />
+                element: <AuthGuard>
+                    <AssistantPage />
+                </AuthGuard>
+            },
+            {
+                path: 'export',
+                element: <AuthGuard>
+                    <ExportPriviewPage />
+                </AuthGuard>
+            },
+            {
+                path: 'devices',
+                element: <AuthGuard>
+                    <RFIDDevicesPage />
+                </AuthGuard>
             },
             {
                 path: 'presensi',
@@ -38,6 +57,10 @@ const AppRouter = createBrowserRouter([
                         element: <CALASAttendancePage />
                     }
                 ]
+            },
+            {
+                path: 'absent',
+                element: <AbsentPage />
             }
         ]
     }

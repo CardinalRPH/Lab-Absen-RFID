@@ -4,36 +4,53 @@ import AttendanceRecapCard from "../components/Cards/AttendanceRecapCard"
 import AttendanceChangeDateCard from "../components/Cards/AttendanceChangeDateCard"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
-import { useState } from "react"
-import ModalMain from "../components/Modals/MdalMain"
+import { useEffect, useState } from "react"
+import ModalMain from "../components/Modals/ModalMain"
 import moment from "moment"
 import AttendanceRenderModal from "../components/Modals/AttendanceRenderModal"
 import AlertMain from "../components/AlertMain.jSX"
 import RootLoading from "../components/RootLoading"
+import { useSelector } from "react-redux"
+import DialogAlertMain from "../components/DialogAlertMain"
+import CurrentDateCard from "../components/Cards/CurrentDateCard"
+import { enLang, idLang } from "../utilities/LanguageTextConfig"
 
 const AssistantAttendancePage = () => {
     const [modalOpen, setModalOpen] = useState(false)
     const [modalTitle, setModalTitle] = useState('')
-    const serverDate = Date.now()
+
+    const currentTimestamp = Date.now()
+    const currentDate_t = new Date(currentTimestamp);
+    const serverDate = new Date(currentDate_t.getTime() + 60 * 60 * 1000)
     const convertedServerDate = moment(serverDate)
+
     const [dateValue, setDateValue] = useState(moment(serverDate));
     const [homeward, setHomeward] = useState(false)
     const [alertOpen, setAlertOpen] = useState(false)
-    const [attendanceTime, setAttendanceTime] = useState(moment(serverDate))
+    const [currentTime, setCurrentTime]= useState(convertedServerDate)
+    const [attendanceTime, setAttendanceTime] = useState(currentTime)
+    const { isAuthenticated } = useSelector(state => state.auths)
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [dialogTitle, setDialogTitle] = useState('')
     const [loading, setLoading] = useState(false)
+    const { isEnLang } = useSelector(state => state.languages)
+    const language = isEnLang ? enLang : idLang
 
     const handleAddAttendance = () => {
+        setAttendanceTime(currentTime)
         setModalOpen(true)
         setHomeward(false)
-        setAttendanceTime(moment(serverDate))
-        setModalTitle('Tambah Presensi Datang')
+        setModalTitle(language?.comeAtd)
     }
 
     const handleRowClick = (rowId) => {
-        setModalOpen(true)
-        setHomeward(true)
-        setModalTitle('Presensi Pulang')
-        console.log(rowId);
+        if (dateValue.isSame(currentTime, 'day')) {
+            setAttendanceTime(currentTime)
+            setModalOpen(true)
+            setHomeward(true)
+            setModalTitle(language?.homewardAtd)
+            console.log(rowId);
+        }
     }
 
     const handleHomewardData = (multiData) => {
@@ -51,7 +68,7 @@ const AssistantAttendancePage = () => {
 
     }
 
-    const handleModalCancle = () => {
+    const handleModalCancel = () => {
         if (homeward) {
             //add homeward function
         } else {
@@ -63,39 +80,69 @@ const AssistantAttendancePage = () => {
         setDateValue(value)
     }
 
+    const handleDeleteData = (multiData, singleData) => {
+        setDialogOpen(true)
+        setDialogTitle(language?.delete)
+        if (multiData) {
+            console.log(multiData);
+            //handle multiple data
+        } else {
+            console.log(singleData);
+            //handle singgle data
+        }
+    }
+
+
+    const handleDialonAcc = () => {
+
+    }
+
+    const handleDialogCancle = () => {
+
+    }
+
+    useEffect(() => {
+        document.title = `${language?.assistantAtd} - Lab ICT Presensi`
+    }, [language?.assistantAtd])
+
     return (
         <>
-            <Container sx={{ my: 5 }}>
-                <Box sx={{ py: 2 }}>
-                    <Card >
-                        <CardContent sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <Typography variant="h4">Presensi Asisten</Typography>
-                        </CardContent>
-                    </Card>
-                </Box>
-                <Box sx={{ display: 'flex', flexWrap: { xs: 'wrap', md: 'nowrap' }, justifyContent: 'space-between' }}>
-                    <Card sx={{ m: 2, width: { xs: '100%', md: '70%' } }}>
+            <Container sx={{ py: 5, minHeight: '91.5vh' }}>
+                <Card >
+                    <CardContent sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                        <Typography variant="h4">{language?.assistantAtd}</Typography>
+                    </CardContent>
+                </Card>
+                <Box sx={{ display: 'flex', my: 2, flexWrap: { xs: 'wrap', md: 'nowrap' }, justifyContent: 'space-between' }}>
+                    <Card sx={{ mr: { xs: 'auto', md: 2 }, width: { xs: '100%', md: '70%' } }}>
                         <CardContent>
-                            <Box sx={{ justifyContent: 'center', display: dateValue.isSame(convertedServerDate, 'day') ? 'flex' : 'none', my: 1, }}>
-                                <Button variant="contained" onClick={()=> loading===false && handleAddAttendance()}>
+                            <Box sx={{ justifyContent: 'center', display: dateValue.isSame(currentTime, 'day') ? 'flex' : 'none', my: 1, }}>
+                                <Button variant="contained" onClick={() => loading === false && handleAddAttendance()}>
                                     {loading ? (<Skeleton sx={{ minWidth: 170 }} />) : (
                                         <>
                                             <Box sx={{ mr: 1 }}>
                                                 <FontAwesomeIcon size="lg" icon={faPlus} />
                                             </Box>
-                                            Tambah Presensi
+                                            {language?.addAtd}
                                         </>
                                     )}
                                 </Button>
                             </Box>
                             {loading ? (<RootLoading />) : (
-                                <TableAttendanceComponent handleRowClick={handleRowClick} handleHomewardData={handleHomewardData} />
+                                <TableAttendanceComponent
+                                    isDateSame={dateValue.isSame(convertedServerDate, 'day')}
+                                    language={language}
+                                    handleRowClick={handleRowClick}
+                                    handleHomewardData={handleHomewardData}
+                                    handleDeleteData={handleDeleteData}
+                                />
                             )}
                         </CardContent>
                     </Card>
-                    <Box sx={{ m: 2, width: { xs: '100%', md: '30%' } }}>
-                        <AttendanceRecapCard loading={loading} label='Asisten' />
-                        <AttendanceChangeDateCard currDate={{ dateValue }} handleChangeDate={handleChangeDate} />
+                    <Box sx={{ ml: { xs: 'auto', md: 2 }, my: { xs: 2, md: 0 }, width: { xs: '100%', md: '30%' } }}>
+                        <AttendanceRecapCard loading={loading} label={language?.assistant} language={language} />
+                        <CurrentDateCard serverDate={serverDate} language={language} setCurrTime={setCurrentTime} />
+                        <AttendanceChangeDateCard title={language?.changeDateAtd} readOnly={!isAuthenticated} language={language} currDate={{ dateValue }} handleChangeDate={handleChangeDate} />
                     </Box>
                 </Box>
             </Container>
@@ -112,13 +159,25 @@ const AssistantAttendancePage = () => {
                 modalTitle={modalTitle}
             >
                 <AttendanceRenderModal
+                    language={language}
                     onAccept={handleModalAcc}
-                    onCancle={handleModalCancle}
+                    onCancle={handleModalCancel}
                     onTimeChange={setAttendanceTime}
                     timeValue={attendanceTime}
                     homeward={homeward}
                 />
             </ModalMain>
+            <DialogAlertMain
+                dialogLabel={dialogTitle}
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
+                handleAccept={handleDialonAcc}
+                handleCancle={handleDialogCancle}
+
+            >
+                lalalala
+
+            </DialogAlertMain>
 
         </>
     )

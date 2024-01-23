@@ -1,149 +1,154 @@
 /* eslint-disable react/prop-types */
 import { faCalendarCheck, faCalendarMinus, faCubes, faLanguage, faMoon, faQrcode, faRightFromBracket, faSun, faUsers } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Avatar, Box, Collapse, Container, Divider, Drawer, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from "@mui/material"
-import { Fragment, useState } from "react"
+import { Avatar, Box, Container, Divider, Drawer, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText } from "@mui/material"
 import { useDispatch, useSelector } from "react-redux"
 import { themeAction } from "../stores/themeState"
+import imagePatternB from "../assets/imagePaternB.jpg"
+import imagePatternW from "../assets/imagePaternW.png"
+import { enLang, idLang } from "../utilities/LanguageTextConfig"
+import { langAction } from "../stores/langState"
 
-const pages = [
-    {
-        name: 'Beranda',
-        icon: faCubes,
-        link: '/home'
-    },
-    {
-        name: 'Asisten',
-        icon: faUsers,
-        link: '/asisten'
-    },
-    {
-        name: 'Presensi Asisten',
-        icon: faCalendarCheck,
-        link: '/presensi/asisten'
-    },
-    {
-        name: 'Presensi CALAS',
-        icon: faCalendarCheck,
-        link: '/presensi/calas'
-    },
-    {
-        name: 'Izin',
-        icon: faCalendarMinus,
-        link: '#'
-    }
-]
+
 
 const DrawerLeft = ({ drawerStates }) => {
-    const [collapseState, setCollapseState] = useState(null)
     const { drawerState = false, toggleDrawer } = drawerStates
     const dispatch = useDispatch()
     const { isDarkMode } = useSelector(state => state.themes)
+    const { isEnLang } = useSelector(state => state.languages)
+    const language = isEnLang ? enLang : idLang
+    const { isAuthenticated } = useSelector(state => state.auths)
 
-    const handleCollapseOpen = (name) => {
-        collapseState ? setCollapseState(null) : setCollapseState(name)
+    const pages = [
+        {
+            name: language.home,
+            icon: faCubes,
+            link: '/home',
+            private: !isAuthenticated
+        },
+        {
+            name: language.assistant,
+            icon: faUsers,
+            link: '/asisten',
+            private: !isAuthenticated
+        },
+        {
+            name: language.assistantAtd,
+            icon: faCalendarCheck,
+            link: '/presensi/asisten',
+            private: false
+        },
+        {
+            name: language.calasAtd,
+            icon: faCalendarCheck,
+            link: '/presensi/calas',
+            private: false
+        },
+        {
+            name: language.absent,
+            icon: faCalendarMinus,
+            link: '/absent',
+            private: false
+        }
+    ]
+
+    const handleLogout = () => {
+
     }
+
     return (
-        <div>
-            <Fragment>
-                <Drawer
-                    anchor="left"
-                    onClose={() => toggleDrawer(false)}
-                    open={drawerState}
-                >
-                    <Box sx={{ width: 250 }}>
-                        {/* container should background image */}
-                        <Container sx={{ backgroundColor: '#1976D2', height: 150, alignItems: 'flex-end', display: 'flex' }} maxWidth="sm">
+        <>
+            <Drawer
+                anchor="left"
+                onClose={() => toggleDrawer(false)}
+                open={drawerState}
+            >
+                <Box sx={{ width: 250 }}>
+                    {/* container should background image */}
+                    <Box sx={{ backgroundImage: `url(${isDarkMode ? imagePatternB : imagePatternW})`, backgroundSize: 'cover', height: 150, }}>
+                        <Container sx={{ backdropFilter: 'blur(2px)', height: 150, alignItems: 'flex-end', display: 'flex', }} maxWidth="sm">
                             <List>
                                 <ListItem disablePadding>
-                                    <ListItemAvatar>
-                                        <Avatar>R</Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText primary={'Roki Gerung'} secondary={'roki@gerung.com'} />
+                                    {isAuthenticated ? (
+                                        <>
+                                            <ListItemAvatar>
+                                                <Avatar>R</Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText primary={'Roki Gerung'} secondary={'roki@gerung.com'} />
+                                        </>
+
+                                    ) : (
+                                        <ListItemText primary='No User Loged' />
+                                    )}
+
+
                                 </ListItem>
                             </List>
                         </Container>
-                        <List sx={{ display: { xs: 'block', md: 'none' } }}>
-                            {pages.map((item, index) => (
-                                <div key={index}>
-                                    {item.link ? (
-                                        <ListItem>
-                                            <ListItemButton href={item.link}>
-                                                <ListItemIcon>
-                                                    <FontAwesomeIcon size="xl" icon={item.icon} />
-                                                </ListItemIcon>
-                                                <ListItemText primary={item.name} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ) : (
-                                        <>
-                                            <ListItem>
-                                                <ListItemButton onClick={() => handleCollapseOpen(item.name)}>
-                                                    <ListItemIcon>
-                                                        <FontAwesomeIcon size="xl" icon={item.icon} />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary={item.name} />
-                                                </ListItemButton>
-                                            </ListItem>
-                                            <Collapse in={collapseState === item.name} timeout="auto" unmountOnExit>
-                                                <List>
-                                                    {item.child.map((childItem, index) => (
-                                                        <ListItem key={index}>
-                                                            <ListItemButton href={childItem.link}>
-                                                                <ListItemText primary={childItem.name} />
-                                                            </ListItemButton>
-                                                        </ListItem>
-                                                    ))}
-                                                </List>
-                                            </Collapse>
-                                        </>
+                    </Box>
+                    <List sx={{ display: { xs: 'block', md: 'none' } }}>
+                        {pages.map((item, index) => (
+                            !item.private && (
+                                <ListItem key={index}>
+                                    <ListItemButton href={item.link}>
+                                        <ListItemIcon>
+                                            <FontAwesomeIcon size="xl" icon={item.icon} />
+                                        </ListItemIcon>
+                                        <ListItemText primary={item.name} />
+                                    </ListItemButton>
+                                </ListItem>
+                            )
 
-                                    )}
-                                </div>
-                            ))}
-                        </List>
-                        <Divider />
-                        <List>
+                        ))}
+                    </List>
+                    <Divider />
+                    <List>
+                        {isAuthenticated && (
                             <ListItem>
-                                <ListItemButton>
+                                <ListItemButton href="/devices">
                                     <ListItemIcon>
                                         <FontAwesomeIcon size="xl" icon={faQrcode} />
                                     </ListItemIcon>
-                                    <ListItemText primary='RFID Devices' />
+                                    <ListItemText primary={language.rfid} />
                                 </ListItemButton>
                             </ListItem>
-                            <ListItem>
-                                <ListItemButton>
-                                    <ListItemIcon>
-                                        <FontAwesomeIcon size="xl" icon={faLanguage} />
-                                    </ListItemIcon>
-                                    <ListItemText primary='English Language' />
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem>
-                                <ListItemButton onClick={() => dispatch(themeAction.setDarkMode(!isDarkMode))}>
-                                    <ListItemIcon>
-                                        <FontAwesomeIcon size="xl" icon={isDarkMode ? faSun : faMoon} />
-                                    </ListItemIcon>
-                                    <ListItemText primary={`${isDarkMode ? 'Light' : 'Dark'} Theme`} />
-                                </ListItemButton>
-                            </ListItem>
-                            <Divider />
-                            <ListItem>
-                                <ListItemButton>
-                                    <ListItemIcon>
-                                        <FontAwesomeIcon size="xl" icon={faRightFromBracket} />
-                                    </ListItemIcon>
-                                    <ListItemText primary='Log Out' />
-                                </ListItemButton>
-                            </ListItem>
-                        </List>
+                        )}
+                        <ListItem>
+                            <ListItemButton onClick={() => dispatch(langAction.setLangMode(!isEnLang))}>
+                                <ListItemIcon>
+                                    <FontAwesomeIcon size="xl" icon={faLanguage} />
+                                </ListItemIcon>
+                                <ListItemText primary={language.lang} />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemButton onClick={() => dispatch(themeAction.setDarkMode(!isDarkMode))}>
+                                <ListItemIcon>
+                                    <FontAwesomeIcon size="xl" icon={isDarkMode ? faSun : faMoon} />
+                                </ListItemIcon>
+                                <ListItemText primary={isDarkMode? language.theme.light: language.theme.dark} />
+                            </ListItemButton>
+                        </ListItem>
+                        {isAuthenticated && (
+                            <>
+                                <Divider />
+                                <ListItem>
+                                    <ListItemButton onClick={handleLogout}>
+                                        <ListItemIcon>
+                                            <FontAwesomeIcon size="xl" icon={faRightFromBracket} />
+                                        </ListItemIcon>
+                                        <ListItemText primary='Log Out' />
+                                    </ListItemButton>
+                                </ListItem>
+                            </>
+                        )}
 
-                    </Box>
-                </Drawer>
+                    </List>
 
-            </Fragment>
-        </div>
+                </Box>
+            </Drawer>
+
+        </>
     )
 }
 

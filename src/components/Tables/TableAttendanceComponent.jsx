@@ -1,6 +1,7 @@
-import { faUserSlash } from "@fortawesome/free-solid-svg-icons";
+/* eslint-disable react/prop-types */
+import { faTrash, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Toolbar, Typography, alpha } from "@mui/material";
+import { Box, Button, Checkbox, ListItemIcon, ListItemText, Menu, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Toolbar, Typography, alpha } from "@mui/material";
 import { useMemo, useState } from "react";
 
 const createData = (id, name, calories, fat, carbs, protein) => {
@@ -63,9 +64,7 @@ const headCells = [
     },
 ];
 
-const EnhancedTableToolbar = (props) => {
-    // eslint-disable-next-line react/prop-types
-    const { numSelected, searchChange, handleHomewardData, selected } = props;
+const EnhancedTableToolbar = ({ numSelected, searchChange, isDateSame, handleHomewardData, handleDeleteData, selected, language }) => {
 
     return (
         <Toolbar
@@ -91,14 +90,20 @@ const EnhancedTableToolbar = (props) => {
 
             {numSelected > 0 ? (
                 <Box sx={{ display: 'flex' }}>
-                    <Button variant="contained" color="warning" sx={{ mx: 1 }} onClick={() => handleHomewardData(selected)}>
-                        <FontAwesomeIcon size="lg" icon={faUserSlash} />
-                        <Typography sx={{ mx: 1 }}>Pulangkan</Typography>
+                    {isDateSame && (
+                        <Button variant="contained" color="warning" sx={{ mx: 1 }} onClick={() => handleHomewardData(selected)}>
+                            <FontAwesomeIcon size="lg" icon={faUserSlash} />
+                            <Typography sx={{ mx: 1 }}>{language?.getHome}</Typography>
+                        </Button>
+                    )}
+                    <Button variant="contained" color="error" sx={{ mx: 1 }} onClick={() => handleDeleteData(selected)}>
+                        <FontAwesomeIcon size="lg" icon={faTrash} />
+                        <Typography sx={{ mx: 1 }}>{language?.delete}</Typography>
                     </Button>
                 </Box>
 
             ) : (
-                <TextField id="outlined-basic" label="Cari" variant="standard" onChange={searchChange} />
+                <TextField id="outlined-basic" label={language?.search} variant="standard" onChange={searchChange} />
             )}
         </Toolbar>
     );
@@ -151,11 +156,13 @@ const EnhancedTableHead = (props) => {
 }
 
 // eslint-disable-next-line react/prop-types
-const TableAttendanceComponent = ({ handleRowClick, handleHomewardData }) => {
+const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDeleteData, language, isDateSame }) => {
     const [selected, setSelected] = useState([]);
     const [tempData, setTempData] = useState(rows)
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
+    const [selectedRow, setSelectedRow] = useState(null)
+    const [pointerPosition, setPointerPosition] = useState(null)
 
     const handleSearchChange = (event) => {
         const searchText = event.target.value
@@ -236,6 +243,23 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData }) => {
         [getComparator, order, orderBy, tempData],
     );
 
+    const handleMenuOpen = (event, id) => {
+        event.preventDefault()
+        setPointerPosition(event.target)
+        setSelectedRow(id)
+
+    }
+
+    const handleMenuClose = () => {
+        setPointerPosition(null)
+        setSelectedRow(null)
+    }
+
+    const handleMenuDelete = () => {
+        handleDeleteData(false, selectedRow)
+        handleMenuClose()
+    }
+
     return (
         <Box>
             <EnhancedTableToolbar
@@ -243,6 +267,9 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData }) => {
                 numSelected={selected.length}
                 selected={selected}
                 handleHomewardData={handleHomewardData}
+                handleDeleteData={handleDeleteData}
+                language={language}
+                isDateSame={isDateSame}
             />
             <TableContainer>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -262,6 +289,7 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData }) => {
                                 <TableRow
                                     hover
                                     onClick={() => handleRowClick(row.id)}
+                                    onContextMenu={(e) => handleMenuOpen(e, row.id)}
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     key={row.id}
@@ -298,6 +326,19 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData }) => {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Menu
+                anchorEl={pointerPosition}
+                open={Boolean(pointerPosition)}
+                onClose={handleMenuClose}
+                keepMounted
+            >
+                <MenuItem onClick={handleMenuDelete}>
+                    <ListItemIcon>
+                        <FontAwesomeIcon icon={faTrash} />
+                    </ListItemIcon>
+                    <ListItemText primary='Delete' />
+                </MenuItem>
+            </Menu>
         </Box>
     )
 

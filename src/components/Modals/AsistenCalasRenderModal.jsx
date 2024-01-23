@@ -1,21 +1,19 @@
 /* eslint-disable react/prop-types */
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Box, Button, FormControl, FormControlLabel, FormLabel, IconButton, InputLabel, MenuItem, Radio, RadioGroup, Select, TextField } from "@mui/material"
+import { Box, Button, FormControl, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, TextField } from "@mui/material"
 import { useEffect, useState } from "react"
+import TextFieldPassword from "../TextFieldPassword"
 
 // eslint-disable-next-line react/prop-types
-const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm, handler, modalTitler }) => {
+const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm, handler, modalTitler, language }) => {
     const { handleDeleteData, handleDisableData, handleEditData, handleSaveData } = handler
     const { setModalTitle, modalTitle } = modalTitler
     const [readOnlyInput, setReadOnlyInput] = useState(false)
     const [emailValidator, setEmailValidator] = useState(false)
     const [purpose, setPurpose] = useState(purposer)
-    const [viewPassword, setViewPassowrd] = useState(false)
 
     const handleInputNumber = (event) => {
         const cleanedValue = event.target.value.replace(/\D/g, '');
-        cleanedValue !== '' && handleInputChange({ target: { name: event.target.name, value: cleanedValue } })
+        handleInputChange({ target: { name: event.target.name, value: cleanedValue } })
     }
 
     const handleInputEmail = (event) => {
@@ -47,7 +45,7 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
     }
 
     useEffect(() => {
-        const cutWord = 'Ubah'
+        const cutWord = language?.edit
         switch (purpose) {
             case 'edit':
                 setReadOnlyInput(false)
@@ -72,13 +70,13 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
             <Box sx={{ display: 'flex', minWidth: { xs: 'auto', md: 800 }, my: 1 }}>
                 <Box sx={{ width: '50%', display: 'flex', flexDirection: 'column', mr: 2 }}>
                     <TextField value={inputForm.nim} name="nim" sx={{ my: 1 }} onChange={handleInputNumber} id="standard-basic" label="NIM" variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
-                    <TextField value={inputForm.email} onChange={handleInputEmail} type='email' name="email" sx={{ my: 1 }} id="standard-basic" label="Email" variant="standard" required inputProps={{ readOnly: readOnlyInput }} error={emailValidator} />
-                    <TextField value={inputForm.phone} name="phone" sx={{ my: 1 }} onChange={handleInputNumber} id="standard-basic" label="Nomor Handphone" variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
+                    <TextField value={inputForm.email} onChange={handleInputEmail} type='email' name="email" sx={{ my: 1 }} id="standard-basic" label={language?.email} variant="standard" required inputProps={{ readOnly: readOnlyInput }} error={emailValidator} />
+                    <TextField value={inputForm.phone} name="phone" sx={{ my: 1 }} onChange={handleInputNumber} id="standard-basic" label={language?.phoneNumber} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
                 </Box>
                 <Box sx={{ width: '50%', display: 'flex', flexDirection: 'column', ml: 2 }}>
-                    <TextField name="name" onChange={handleInputChange} value={inputForm.name} sx={{ my: 1 }} id="standard-basic" label="Nama Lengkap" variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
+                    <TextField name="name" onChange={handleInputChange} value={inputForm.name} sx={{ my: 1 }} id="standard-basic" label={language?.fullName} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
                     <FormControl sx={{ my: 1 }}>
-                        <FormLabel id='radio-buttons-group-label'>Jenis Kelamin</FormLabel>
+                        <FormLabel id='radio-buttons-group-label'>{language?.gender}</FormLabel>
                         <RadioGroup
                             row
                             name="gender"
@@ -86,17 +84,17 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
                             value={inputForm.gender}
                             onChange={handleInputChange}
                             defaultValue='laki-laki'>
-                            <FormControlLabel value="laki-laki" control={<Radio />} label="Laki-laki" disabled={readOnlyInput} required />
-                            <FormControlLabel value="perempuan" control={<Radio />} label="Perempuan" disabled={readOnlyInput} required />
+                            <FormControlLabel value="laki-laki" control={<Radio />} label={language?.male} componentsProps={{ typography: { color: 'text.secondary' } }} disabled={readOnlyInput} required />
+                            <FormControlLabel value="perempuan" control={<Radio />} label={language?.female} componentsProps={{ typography: { color: 'text.secondary' } }} disabled={readOnlyInput} required />
                         </RadioGroup>
                     </FormControl>
                     {inputForm.position !== 'calonAsisten' && (
-                        <TextField name="cardId" onChange={handleInputChange} value={inputForm.cardId} sx={{ my: 1 }} id="standard-basic" label="Nomor Serial Kartu" variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
+                        <TextField name="cardId" onChange={handleInputChange} value={inputForm.cardId} sx={{ my: 1 }} id="standard-basic" label={language?.cardSerialNumber} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
                     )}
                 </Box>
             </Box>
             <FormControl fullWidth sx={{ my: 1 }} required>
-                <InputLabel id="demo-simple-select-label">Jabatan</InputLabel>
+                <InputLabel id="demo-simple-select-label">{language?.position}</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
@@ -106,43 +104,37 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
                     onChange={handleInputChange}
                     inputProps={{ readOnly: readOnlyInput }}
                 >
-                    <MenuItem value='calonAsisten'>Calon Asisten</MenuItem>
-                    <MenuItem value='asisten'>Asisten</MenuItem>
+                    <MenuItem value='calonAsisten'>{language?.calas_l}</MenuItem>
+                    <MenuItem value='asisten'>{language?.assistant}</MenuItem>
                     <MenuItem value='spv'>SPV</MenuItem>
                 </Select>
             </FormControl>
             {inputForm.position === 'spv' && (
-                <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                        <TextField name="password" onChange={handleInputChange} value={inputForm.password} sx={{ my: 1 }} id="standard-basic" label="Kata Sandi" variant="standard" required type={viewPassword ? 'text' : 'password'} inputProps={{ readOnly: readOnlyInput }} />
-                    </Box>
-                    <IconButton onClick={() => setViewPassowrd(!viewPassword)}>
-                        {viewPassword ? (<FontAwesomeIcon icon={faEyeSlash} />) : (<FontAwesomeIcon icon={faEye} />)}
-                    </IconButton>
-                </Box>
+                <TextFieldPassword name='password' variant="standard" label={language?.password} onChange={handleInputChange} value={inputForm.password} readOnly={readOnlyInput} />
+
             )}
             <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
 
                 {purpose === 'view' && (
                     <>
 
-                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => modalSeter(false)} >Batal</Button>
-                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleDeleteData()}>Hapus</Button>
-                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleDisableData()}>Nonaktifkan</Button>
-                        <Button variant="contained" onClick={() => setPurpose('edit')} sx={{ mx: 1 }}>Ubah</Button>
+                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => modalSeter(false)} >{language?.cancel}</Button>
+                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleDeleteData()}>{language?.delete}</Button>
+                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleDisableData()}>{language?.disableIt}</Button>
+                        <Button variant="contained" onClick={() => setPurpose('edit')} sx={{ mx: 1 }}>{language?.edit}</Button>
                     </>
                 )}
                 {purpose === 'edit' && (
                     <>
-                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => setPurpose('view')} >Batal</Button>
-                        <Button variant="contained" sx={{ mx: 1 }} type="submit" >Simpan Ubah</Button>
+                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => setPurpose('view')} >{language?.cancel}</Button>
+                        <Button variant="contained" sx={{ mx: 1 }} type="submit" >{language?.saveChange}</Button>
 
                     </>
                 )}
                 {purpose === 'add' && (
                     <>
-                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => modalSeter(false)} >Batal</Button>
-                        <Button variant="contained" type="submit" sx={{ mx: 1 }}>Simpan</Button>
+                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => modalSeter(false)} >{language?.cancel}</Button>
+                        <Button variant="contained" type="submit" sx={{ mx: 1 }}>{language?.save}</Button>
                     </>
                 )}
             </Box>

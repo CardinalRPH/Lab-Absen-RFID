@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import DrawerLeft from "../components/DrawerLeft"
 import Header from "../components/Header"
 import { Outlet } from "react-router-dom"
-import { ThemeProvider } from "@mui/material"
+import { Box, ThemeProvider } from "@mui/material"
 import { darkTheme, lightTheme } from "../utilities/themePelette"
 import { useSelector } from "react-redux"
 
@@ -20,7 +20,9 @@ const RootLayout = () => {
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
             <Header toggleDrawer={toggleDrawer} />
             <DrawerLeft drawerStates={{ drawerState, toggleDrawer }} />
-            <Outlet />
+            <Box sx={{ bgcolor: 'background.default' }}>
+                <Outlet />
+            </Box>
         </ThemeProvider>
 
     )

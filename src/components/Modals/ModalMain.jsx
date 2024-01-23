@@ -30,7 +30,7 @@ const ModalMain = ({ open, onClose, children, modalTitle }) => {
         >
             <Fade in={open}>
                 <Box sx={style}>
-                    <Typography id="modal-title" variant="h6" component="h2">
+                    <Typography id="modal-title" color='text.primary' variant="h6" component="h2">
                         {modalTitle}
                     </Typography>
                     {children}

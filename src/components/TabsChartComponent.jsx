@@ -32,18 +32,20 @@ function a11yProps(index) {
     };
 }
 
-const barChartSetting = {
-    yAxis: [
-        {
-            label: 'Asisten',
-        },
-    ],
-    width: 400,
-    height: 300,
+const barChartSetting = (lang) => {
+    return {
+        yAxis: [
+            {
+                label: lang.assistant,
+            },
+        ],
+        width: 400,
+        height: 300,
+    }
 };
 const valueFormatter = (value) => `${value} Asisten`;
 
-const TabsChartComponent = ({ data, loading }) => {
+const TabsChartComponent = ({ data, loading, language }) => {
 
     const [value, setValue] = useState(0);
 
@@ -56,10 +58,10 @@ const TabsChartComponent = ({ data, loading }) => {
                 <>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs centered value={value} onChange={handleChange} aria-label="basic tabs example">
-                            <Tab label="Fakultas & Jurusan" {...a11yProps(0)} />
-                            <Tab label="Jenis Kelamin" {...a11yProps(1)} />
-                            <Tab label="Tahun Masuk" {...a11yProps(2)} />
-                            <Tab label="Jabatan" {...a11yProps(3)} />
+                            <Tab label={language?.facultDep} {...a11yProps(0)} />
+                            <Tab label={language?.gender} {...a11yProps(1)} />
+                            <Tab label={language?.entryYear} {...a11yProps(2)} />
+                            <Tab label={language?.position} {...a11yProps(3)} />
                         </Tabs>
                     </Box>
                     <CustomTabPanel value={value} index={0}>
@@ -84,7 +86,7 @@ const TabsChartComponent = ({ data, loading }) => {
                                     top: 80,
                                     bottom: 80,
                                 }}
-                                {...barChartSetting}
+                                {...barChartSetting(language)}
                             />
                             <BarChart
                                 dataset={data.fakultas.fe.data}
@@ -105,7 +107,7 @@ const TabsChartComponent = ({ data, loading }) => {
                                     top: 80,
                                     bottom: 80,
                                 }}
-                                {...barChartSetting}
+                                {...barChartSetting(language)}
                             />
                             <BarChart
                                 dataset={data.fakultas.ft.data}
@@ -126,7 +128,7 @@ const TabsChartComponent = ({ data, loading }) => {
                                     top: 80,
                                     bottom: 80,
                                 }}
-                                {...barChartSetting}
+                                {...barChartSetting(language)}
                             />
                             <BarChart
                                 dataset={data.fakultas.fisip.data}
@@ -147,7 +149,7 @@ const TabsChartComponent = ({ data, loading }) => {
                                     top: 80,
                                     bottom: 80,
                                 }}
-                                {...barChartSetting}
+                                {...barChartSetting(language)}
                             />
                         </Box>
 
@@ -181,7 +183,7 @@ const TabsChartComponent = ({ data, loading }) => {
                                 bottom: 50,
                             }}
                         />
-                        <Typography sx={{ margin: 2 }}>{`Total ${data.jenis_kelamin.total} Asisten`}</Typography>
+                        <Typography sx={{ margin: 2 }}>{`Total ${data.jenis_kelamin.total} ${language?.assistant}`}</Typography>
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={2}>
                         <PieChart
@@ -213,7 +215,7 @@ const TabsChartComponent = ({ data, loading }) => {
                                 bottom: 50,
                             }}
                         />
-                        <Typography sx={{ margin: 2 }}>{`Total ${data.tahun_masuk.total} Asisten`}</Typography>
+                        <Typography sx={{ margin: 2 }}>{`Total ${data.tahun_masuk.total} ${language?.assistant}`}</Typography>
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={3}>
                         <PieChart
@@ -246,7 +248,7 @@ const TabsChartComponent = ({ data, loading }) => {
                             }}
 
                         />
-                        <Typography sx={{ margin: 2 }}>{`Total ${data.jabatan.total} Asisten`}</Typography>
+                        <Typography sx={{ margin: 2 }}>{`Total ${data.jabatan.total} ${language?.assistant}`}</Typography>
                     </CustomTabPanel>
                 </>
             )}
