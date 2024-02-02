@@ -16,6 +16,13 @@ app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(static_(join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/api', indexRouter);
+app.use((req, res, next) => {
+    res.status(404);
+    if (req.accepts('json')) {
+        res.json({ error: 'Not found' });
+        return;
+    }
+})
 
 export default app;
