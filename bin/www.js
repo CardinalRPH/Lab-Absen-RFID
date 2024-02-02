@@ -6,8 +6,9 @@
 
 import app from '../app.js';
 import debugLib from 'debug';
-const debug = debugLib('calendar-by-full-calendar:server');
+const debug = debugLib('labAbsen:server');
 import { createServer } from 'http';
+import webSocketServer from './webSocketServer.js';
 
 /**
  * Get port from environment and store in Express.
@@ -19,8 +20,8 @@ app.set('port', port);
 /**
  * Create HTTP server.
  */
-
-const server = createServer(app);
+const server = createServer(app)
+webSocketServer(server)
 
 /**
  * Listen on provided port, on all network interfaces.

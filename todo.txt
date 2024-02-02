@@ -1,14 +1,3 @@
-##Middleware
-    +Regular Middleware
-        +Attendance
-            +Attendance RFID
-            +Attendance Regular
-        +Assistant
-        +Login
-
-    +Ws Middleware
-        +RFID Device getter
-
 ##Logic Controller
     +Assistant Controller
         +ADD

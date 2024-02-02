@@ -5,7 +5,5 @@ export const Bhash = async (password, saltRound = 10) => {
 }
 
 export const Bcompare = async (password, hashedPassword) => {
-    const d = await compare(password, hashedPassword)
-    console.log(d);
-    return d
+    return await compare(password, hashedPassword)
 }

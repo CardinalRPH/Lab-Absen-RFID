@@ -9,9 +9,10 @@ export const generateBearerToken = (payload, expire = 12) => {
 export const verifyBearerToken = (bearerToken) => {
     try {
         const tokenWithoutBearer = bearerToken.replace('Bearer ', '');
-        jwt.verify(tokenWithoutBearer, process.env.SECRET_KEY);
-        return true
+        const _verif = jwt.verify(tokenWithoutBearer, process.env.SECRET_KEY);
+        console.log(_verif);
+        return _verif
     } catch (error) {
-        return false;
+        return false
     }
 }

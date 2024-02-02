@@ -11,7 +11,9 @@ export default async (req, res) => {
         const { data } = await sqlQuery(`SELECT * FROM asisten WHERE nim=${user || 0}`)
         datas = data
     } catch (error) {
-        console.log(error);
+        res.status(500).json({
+            error: 'Internal Server Error'
+        })
     }
 
     //if user not FOund
@@ -23,7 +25,7 @@ export default async (req, res) => {
     }
 
     //checking Password
-    if (!Bcompare(password || '0', '$2a$10$Lf9T.Dm6Kw4zVmV9HxAI8.Ma01pGZ.g1aGNfQTZYSixFT3RE2YOKm')) {
+    if (Bcompare(password || '0', datas[0]?.kata_sandi) === false) {
         res.status(200).json({
             error: 'Wrong Password'
         })
