@@ -8,7 +8,7 @@ export default async (req, res) => {
 
     //get datas from db
     try {
-        const { data } = await sqlQuery(`SELECT * FROM asisten WHERE nim=${user || 0}`)
+        const { data } = await sqlQuery(`SELECT * FROM asisten WHERE nim=${user || '0'}`)
         datas = data
     } catch (error) {
         res.status(500).json({
