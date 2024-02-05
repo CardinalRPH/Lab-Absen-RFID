@@ -1,4 +1,20 @@
+import sqlQuery from "../config/sqlQuery"
+
 export const attendancePost = (req, res) => {
+    const {nim}= req.body
+    
+    try {
+        const {data}= sqlQuery(`SELECT nim FROM asisten WHERE nim=${nim||'0'}`)
+        if(!data[0]) {
+            res.status(200).json({
+                error: 'User Not Found'
+            })
+            return
+        }
+        sqlQuery(`INSERT INTO presensi  `)
+    } catch (error) {
+        
+    }
     //in here when add new attendance
 }
 export const attendancePut = (req, res) => {
