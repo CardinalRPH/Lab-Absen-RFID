@@ -11,6 +11,7 @@ export default async (req, res) => {
         const { data } = await sqlQuery(`SELECT * FROM asisten WHERE nim=${user || '0'}`)
         datas = data
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             error: 'Internal Server Error'
         })

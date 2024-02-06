@@ -4,7 +4,7 @@ import loginController from '../controllers/loginController.js';
 import unloggedMid from '../middlewares/unloggedMid.js';
 import loggedMid from '../middlewares/loggedMid.js';
 import { assistantDelete, assistantGet, assistantGetAssistant, assistantGetCalas, assistantPost, assistantPut } from '../controllers/assistantController.js';
-import { attendanceDelete, attendanceGet, attendanceGetAssistant, attendanceGetCalas, attendancePost, attendancePut } from '../controllers/attendanceController.js';
+import { attendanceDelete, attendanceGet, attendancePost, attendancePut } from '../controllers/attendanceController.js';
 import { leaveDelete, leaveGet, leavePost, leavePut } from '../controllers/leaveController.js';
 import { RFIDDelete, RFIDGet, RFIDPost, RFIDPut } from '../controllers/RFIDController.js';
 import exportController from '../controllers/exportController.js';
@@ -27,8 +27,6 @@ router.delete('/assistant', loggedMid, assistantDelete)
 router.post('/attendance', unloggedMid, attendancePost)
 router.put('/attendance', unloggedMid, attendancePut)
 router.get('/attendance', unloggedMid, attendanceGet)
-router.get('/attendance/assistant', unloggedMid, attendanceGetAssistant)
-router.get('/attendance/calas', unloggedMid, attendanceGetCalas)
 router.delete('/attendance', unloggedMid, attendanceDelete)
 
 router.post('/leave', unloggedMid, leavePost)
