@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import dotenv from 'dotenv';
 import indexRouter from './routes/index.js';
-import { WebSocket } from 'ws';
+
 dotenv.config();
 
 const app = express();
