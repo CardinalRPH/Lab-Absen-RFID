@@ -19,7 +19,7 @@ export default (server) => {
     })
 }
 
-export const wsSendMsg = (message) => {
+export const wsBroadcastdMsg = (message) => {
     clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify(message))
