@@ -5,7 +5,9 @@ import verifyToken from "../security/header/verifyToken.js";
 
 export default (req, res, next) => {
     try {
-        checkContentType(req)
+        if (req.method !== "GET") {
+            checkContentType(req)
+        }
         checkAcceptHeader(req)
         verifyToken(req)
         reqValid(req)

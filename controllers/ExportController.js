@@ -12,6 +12,17 @@ export default async (req, res) => {
     }
 
     let assistantTime = ''
+    let queryPosition = ''
+
+    if (position === 'all') {
+        queryPosition = ''
+    } else if (position === 'Asisten') {
+        queryPosition = 'AND a.jabatan = "Asisten" OR a.jabatan = "Supervisor"'
+    } else if (position === 'Calon Asisten') {
+        queryPosition = 'AND a.jabatan = "Calon Asisten"'
+    } else {
+        queryPosition = ''
+    }
 
     if (position === 'Asisten') {
         assistantTime = '08:00:00'
@@ -28,7 +39,7 @@ export default async (req, res) => {
          a.nama,
          COUNT(DISTINCT i.tanggal_izin) AS jumlah_izin,
          COUNT(DISTINCT p.tanggal_presensi)AS jumlah_hadir,
-         COUNT(DISTINCT CASE WHEN DAYOFWEEK(p.tanggal_presensi) = 7 THEN p.nim END) AS jumlah_presensi_sabtu,
+         COUNT(DISTINCT CASE WHEN DAYOFWEEK(p.tanggal_presensi) = 7 THEN p.nim END) AS jumlah_presensi_lembur,
          CONCAT(
              ROUND(
                  SUM(
@@ -49,10 +60,10 @@ export default async (req, res) => {
      LEFT JOIN 
          presensi p ON a.nim = p.nim AND p.tanggal_presensi BETWEEN ? AND ?
      WHERE
-         a.status = 'aktif' AND a.jabatan = ?
+         a.status = 'aktif' ${queryPosition}
      GROUP BY 
          a.nim, a.nama;
-     `, [assistantTime, assistantTime, dateS, dateE, dateS, dateE, position])
+     `, [assistantTime, assistantTime, dateS, dateE, dateS, dateE])
 
         res.status(200).json({
             data

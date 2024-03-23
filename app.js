@@ -2,6 +2,7 @@ import express, { json, urlencoded, static as static_ } from 'express';
 import path, { join } from 'path'
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
+import cors from 'cors'
 import dotenv from 'dotenv';
 import indexRouter from './routes/index.js';
 
@@ -15,6 +16,10 @@ app.use(logger('dev'));
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors({
+    credentials: true,
+    origin: 'http://192.168.1.8:5173'
+}))
 app.use(static_(join(__dirname, 'public')));
 
 app.use('/api', indexRouter);

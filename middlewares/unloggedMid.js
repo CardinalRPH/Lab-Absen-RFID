@@ -4,7 +4,9 @@ import reqValid from "../security/validation/reqValid.js"
 
 export default (req, res, next) => {
     try {
-        checkContentType(req)
+        if (req.method !== "GET") {
+            checkContentType(req)
+        }
         checkAcceptHeader(req)
         reqValid(req)
         next()

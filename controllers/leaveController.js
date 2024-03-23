@@ -6,46 +6,72 @@ export const leavePost = async (req, res) => {
     //in here when add new leave assistant
     const { nim, info, dateS, dateE } = req.body
 
-    if (!nim, !info, !dateS, !dateE) {
+    if (!nim || !info || !dateS || !dateE) {
         res.status(400).json({
             error: 'Bad Request: some key not appears'
         })
         return
     }
 
-    const diffDays = calDateDiff(dateS, dateE)
-    const value = [];
+    let assistant_data = []
 
-    for (let i = 0; i <= diffDays; i++) {
-        const date1 = new Date(dateS)
-        const currentDate = new Date(date1);
-        currentDate.setDate(date1.getDate() + i);
-        const formattedDate = isoDateFormater(currentDate.toISOString)
-        value.push([nim, info, formattedDate]);
-    }
-
-    if (value.length <= 0) {
+    try {
+        assistant_data = JSON.parse(nim)
+        if (typeof assistant_data !== 'object') {
+            res.status(400).json({
+                error: 'Bad Request: string is not object value'
+            })
+            return
+        }
+    } catch (error) {
         res.status(400).json({
-            error: 'Bad Request: Date Is Not Iso Date'
+            error: 'Bad Request: string is not object value'
         })
         return
     }
 
+
     try {
         const { data } = await sqlQuery(`SELECT nim FROM asisten 
-        WHERE nim=?
-        AND NOT EXIST (SELECT 1 FROM izin
-            WHERE izin.tanggal_izin BETWEEN ? AND ? )`)
-        if (!data) {
-            res.status(200).json({
-                error: `User ${nim}  Not Found or Already ;Leave`
+        WHERE nim IN (?)
+        AND status='Aktif'
+        AND NOT EXISTS (SELECT 1 FROM izin
+            WHERE  izin.nim=asisten.nim
+            AND izin.tanggal_izin BETWEEN ? AND ? )
+        AND NOT EXISTS (
+            SELECT 1
+            FROM presensi
+            WHERE presensi.nim = asisten.nim
+            AND presensi.tanggal_presensi BETWEEN ? AND ?
+        )`, [assistant_data, dateS, dateE, dateS, dateE])
+
+        const diffArr = assistant_data.filter(value => !data.some(sqlData => sqlData.nim === value.toString()))
+
+        if (diffArr.length > 0) {
+            const usersnotFound = diffArr.join(',');
+            res.status(404).json({
+                error: `User ${usersnotFound}  Not Found or Already In`
             })
             return
         }
 
-        await sqlQuery(`INSERT INTO IZIN VALUES (?))`, [value])
+        const diffDays = calDateDiff(dateS, dateE)
+        const value = []
+
+        assistant_data.forEach((item) => {
+            for (let i = 0; i <= diffDays; i++) {
+                const date1 = new Date(dateS)
+                const currentDate = new Date(date1);
+                currentDate.setDate(date1.getDate() + i);
+                const formattedDate = isoDateFormater(currentDate.toISOString())
+                value.push([item, info, formattedDate]);
+            }
+        })
+
+        //need fix?
+        await sqlQuery(`INSERT INTO IZIN (nim, keterangan, tanggal_izin) VALUES ?`, [value])
         res.status(200).json({
-            message: `${nim} SUcces Leave`
+            message: `${nim} Succes Leave`
         })
     } catch (error) {
         console.error(error);
@@ -57,10 +83,10 @@ export const leavePost = async (req, res) => {
 }
 export const leavePut = async (req, res) => {
     //in here when edit leave assistant
-    const { nim, date } = req.body
+    const { nim, date, info } = req.body
 
 
-    if (!nim) {
+    if (!nim || !date || !info) {
         res.status(400).json({
             error: 'Bad Request: some key not appears'
         })
@@ -69,15 +95,15 @@ export const leavePut = async (req, res) => {
 
     try {
         const { data = [] } = await sqlQuery(`SELECT nim FROM izin 
-        WHEERE nim=? AND tanggal_izin=?`, [nim, date])
+        WHERE nim=? AND tanggal_izin=?`, [nim, date])
         if (data.length <= 0) {
-            res.status(200).json({
+            res.status(404).json({
                 error: `User ${nim}  Not Found or Not Leave`
             })
             return
         }
 
-        await sqlQuery(`UPDATE SET keterangan=? WHERE nim=?, AND tanggal_izin=?`, [info, nim, date])
+        await sqlQuery(`UPDATE izin SET keterangan=? WHERE nim=? AND tanggal_izin=?`, [info, nim, date])
         res.status(200).json({
             message: `${nim} Leave Updated`
         })
@@ -91,23 +117,46 @@ export const leavePut = async (req, res) => {
 }
 export const leaveDelete = async (req, res) => {
     //in here when delete leave assistant
-    const { nim, date } = req.body
     //array
+    const { nim, date } = req.body
+    let assistant_nim = []
+
+    if (!nim || !date) {
+        res.status(400).json({
+            error: 'Bad Request: some key not appears'
+        })
+        return
+    }
+
+    try {
+        assistant_nim = JSON.parse(nim)
+        if (typeof assistant_nim !== 'object') {
+            res.status(400).json({
+                error: 'Bad Request: string is not object value'
+            })
+            return
+        }
+    } catch (error) {
+        res.status(400).json({
+            error: 'Bad Request: string is not object value'
+        })
+        return
+    }
 
     try {
         const { data = [] } = await sqlQuery(`SELECT nim FROM izin 
-        WHEERE nim IN ? AND tanggal_izin=?`, [nim, date])
-        if (data.length <= 0) {
-            res.status(200).json({
-                error: `User ${nim}  Not Found or Not Leave`
+        WHERE nim IN (?) AND tanggal_izin=?`, [assistant_nim, date])
+        if (data.length !== assistant_nim.length) {
+            res.status(404).json({
+                error: `Some NIM  Not Found`
             })
             return
         }
 
         await sqlQuery(`DELETE FROM izin 
-        WHERE nim IN ? AND tanggal_izin=?`, [nim, date])
+        WHERE nim IN (?) AND tanggal_izin=?`, [assistant_nim, date])
         res.status(200).json({
-            message: `${nim} SUcces Leave`
+            message: `${nim} Succes Leave`
         })
     } catch (error) {
         console.error(error);
@@ -124,9 +173,21 @@ export const leaveGet = async (req, res) => {
     const { formattedDate } = getCurrDateTime()
 
     try {
-        const { data = [] } = await sqlQuery(`SELECT izin.nim, izin.keterangan, izin.tanggal_izin FROM izin
-        INNER JOIN asisten ON asisten.nim=izin.nim
-        WHERE izin.tanggal_izin=?`, [date || formattedDate])
+        const { data = [] } = await sqlQuery(`SELECT asisten.nim, izin1.keterangan, izin1.tanggal_izin, asisten.nama, asisten.jabatan 
+        FROM asisten
+        INNER JOIN izin izin1 ON asisten.nim = izin1.nim
+        WHERE izin1.tanggal_izin = ? AND asisten.status = 'Aktif'
+        UNION
+        SELECT asisten.nim, izin2.keterangan, izin2.tanggal_izin, asisten.nama, asisten.jabatan 
+        FROM asisten
+        LEFT JOIN izin izin2 ON asisten.nim = izin2.nim AND izin2.tanggal_izin = ?
+        WHERE asisten.status = 'Aktif' AND izin2.nim IS NULL
+        AND NOT EXISTS (
+            SELECT 1
+            FROM presensi
+            WHERE asisten.nim = presensi.nim
+            AND presensi.tanggal_presensi=?
+        )`, [date || formattedDate, date || formattedDate, date || formattedDate])
 
         res.status(200).json({
             data
