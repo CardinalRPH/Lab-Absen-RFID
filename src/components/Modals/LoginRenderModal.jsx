@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, TextField } from "@mui/material"
+import { Box, Button, CircularProgress, TextField } from "@mui/material"
 import TextFieldPassword from "../TextFieldPassword"
 
-const LoginRenderModal = ({ value, setInputValue, handleLogin, language }) => {
+const LoginRenderModal = ({ value, setInputValue, handleLogin, language, buttonLoading=false }) => {
     const handleInputChange = (event) => {
         setInputValue(prevState => ({
             ...prevState,
@@ -15,13 +15,14 @@ const LoginRenderModal = ({ value, setInputValue, handleLogin, language }) => {
         handleInputChange({ target: { name: event.target.name, value: cleanedValue } })
     }
     return (
-        <Box sx={{ minWidth: 400, display: 'flex', flexDirection: 'column', my: 2 }}>
+        <Box sx={{ minWidth: 400, display: 'flex', flexDirection: 'column', my: 2 }} component={'form'} onSubmit={handleLogin}>
             <TextField
                 sx={{ m: 1 }}
                 label='NIM'
-                name="nim"
-                value={value.nim}
+                name="user"
+                value={value.user}
                 onChange={handleInputNumber}
+                required
             />
             <TextFieldPassword
                 label={language?.password}
@@ -29,10 +30,16 @@ const LoginRenderModal = ({ value, setInputValue, handleLogin, language }) => {
                 containerSx={{ m: 1 }}
                 value={value.password}
                 onChange={handleInputChange}
-
             />
             <Box sx={{ display: 'flex', justifyContent: 'center', m: 1 }}>
-                <Button onClick={handleLogin} variant="contained">Login</Button>
+                <Button type="submit" sx={{ p: 1 }} disabled={buttonLoading} variant="contained">
+                    {buttonLoading ? (
+                        <CircularProgress color="inherit" size={30} />
+                    ) : (
+                       "Login"
+                    )}
+
+                </Button>
             </Box>
         </Box>
     )

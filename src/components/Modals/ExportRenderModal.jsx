@@ -27,9 +27,9 @@ const ExportRenderModal = ({ handleDateRange, handleRadio, modalSeter, language 
                     value={radioReportVal}
                     onChange={(event) => setRadioReportVal(event.target.value)}
                     defaultValue='semua'>
-                    <FormControlLabel componentsProps={{ typography: { color: 'text.secondary' } }} value="semua" control={<Radio />} label={language?.all} required />
-                    <FormControlLabel componentsProps={{ typography: { color: 'text.secondary' } }} value="asisten" control={<Radio />} label={language?.assistant} required />
-                    <FormControlLabel componentsProps={{ typography: { color: 'text.secondary' } }} value="calon_asisten" control={<Radio />} label={language?.calas_l} required />
+                    <FormControlLabel componentsProps={{ typography: { color: 'text.secondary' } }} value="all" control={<Radio />} label={language?.all} required />
+                    <FormControlLabel componentsProps={{ typography: { color: 'text.secondary' } }} value="Asisten" control={<Radio />} label={language?.assistant} required />
+                    <FormControlLabel componentsProps={{ typography: { color: 'text.secondary' } }} value="Calon Asisten" control={<Radio />} label={language?.calas_l} required />
                 </RadioGroup>
             </FormControl>
             <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>

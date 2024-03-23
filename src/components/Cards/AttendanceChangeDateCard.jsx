@@ -2,7 +2,7 @@
 import { Box, Card, CardContent, Typography } from "@mui/material"
 import MobileDPicker from "../DateAndTime/MobileDPicker"
 
-const AttendanceChangeDateCard = ({ currDate, handleChangeDate, readOnly, language, title }) => {
+const AttendanceChangeDateCard = ({ currDate, handleChangeDate, readOnly, language, title, disableFuture=true }) => {
     const { dateValue } = currDate
     return (
         <Card sx={{ my: 2 }}>
@@ -12,7 +12,7 @@ const AttendanceChangeDateCard = ({ currDate, handleChangeDate, readOnly, langua
                     <MobileDPicker
                         dateValue={dateValue}
                         handleChangeDate={handleChangeDate}
-                        disableFuture={true}
+                        disableFuture={disableFuture}
                         label={language?.changeDate}
                         readOnly={readOnly}
                     />

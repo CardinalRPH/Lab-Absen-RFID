@@ -1,116 +1,269 @@
-import { faPlus } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Box, Button, Card, CardContent, Container, Skeleton, Typography } from "@mui/material"
-import moment from "moment"
-import { useEffect, useState } from "react"
-import RootLoading from "../components/RootLoading"
 import TableAttendanceComponent from "../components/Tables/TableAttendanceComponent"
 import AttendanceRecapCard from "../components/Cards/AttendanceRecapCard"
 import AttendanceChangeDateCard from "../components/Cards/AttendanceChangeDateCard"
-import AlertMain from "../components/AlertMain"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPlus } from "@fortawesome/free-solid-svg-icons"
+import { useEffect, useState } from "react"
 import ModalMain from "../components/Modals/ModalMain"
+import moment from "moment"
 import AttendanceRenderModal from "../components/Modals/AttendanceRenderModal"
+import AlertMain from "../components/AlertMain"
+import RootLoading from "../components/RootLoading"
 import { useSelector } from "react-redux"
 import DialogAlertMain from "../components/DialogAlertMain"
 import CurrentDateCard from "../components/Cards/CurrentDateCard"
 import { enLang, idLang } from "../utilities/LanguageTextConfig"
+import { useDelete, useGet, usePost, usePut } from "../hooks/dataHandler"
+import calculateLate from "../utilities/calculateLate"
+import dateFormater, { formatLocalDateISO, shortDateFormater } from "../utilities/dateFormater"
 
-const CALASAttendancePage = () => {
+const AssistantAttendancePage = () => {
     const [modalOpen, setModalOpen] = useState(false)
     const [modalTitle, setModalTitle] = useState('')
 
-    const currentTimestamp = Date.now()
-    const currentDate = new Date(currentTimestamp);
-    const serverDate = new Date(currentDate.getTime() + 60 * 60 * 1000)
-    const convertedServerDate = moment(serverDate)
-
-    const [dateValue, setDateValue] = useState(moment(serverDate));
     const [homeward, setHomeward] = useState(false)
     const [alertOpen, setAlertOpen] = useState(false)
-    const [currentTime, setCurrentTime] = useState(convertedServerDate)
-    const [attendanceTime, setAttendanceTime] = useState(currentTime)
+    const [alertContent, setAlertContent] = useState({
+        title: '',
+        severity: 'warning',
+        content:''
+    })
+
+    const { timeStamp } = useSelector(state => state.cTimeStamp)
     const { isAuthenticated } = useSelector(state => state.auths)
     const [dialogOpen, setDialogOpen] = useState(false)
     const [dialogTitle, setDialogTitle] = useState('')
-    const [loading, setLoading] = useState(false)
+    const [dialogContent, setDialogContent] = useState('')
+    const [dialogData, setDialogData] = useState([])
     const { isEnLang } = useSelector(state => state.languages)
     const language = isEnLang ? enLang : idLang
 
+    const { data: data1, loading, error: error1, execute: execute1 } = useGet("attendance")
+    const { data: data3, execute: execute3, error: error3 } = usePost("attendance")
+    const { data: data4, execute: execute4, error: error4 } = usePut("attendance")
+    const { data: data5, execute: execute5, error: error5 } = useDelete("attendance")
+
+    const [serverTime, setServerTime] = useState(new Date(Date.now()))
+
+    const convertedServerDate = moment(serverTime)
+    const [currentTime, setCurrentTime] = useState(convertedServerDate)
+    const [attendanceTime, setAttendanceTime] = useState(currentTime)
+    const [outTime, setOutTime] = useState(currentTime)
+    const [dateValue, setDateValue] = useState(moment(serverTime));
+
+    const [tableData, setTableData] = useState([])
+    const [modalData, setModalData] = useState([])
+    const [homewardData, setHomewardData] = useState({})
+    const [personName, setPersonName] = useState([]);
+    const [recapData, setRecapData] = useState({
+        present: 0,
+        notpresent: 0,
+        onTime: 0,
+        late: 0
+    })
+
     const handleAddAttendance = () => {
+        setAttendanceTime(currentTime)
         setModalOpen(true)
         setHomeward(false)
-        setAttendanceTime(currentTime)
         setModalTitle(language?.comeAtd)
     }
 
     const handleRowClick = (rowId) => {
         if (dateValue.isSame(currentTime, 'day')) {
+            setHomewardData(tableData?.find((item) => item.nim === rowId))
+            setHomeward(true)
+            setOutTime(currentTime)
             setAttendanceTime(currentTime)
             setModalOpen(true)
-            setHomeward(true)
             setModalTitle(language?.homewardAtd)
             console.log(rowId);
         }
     }
 
-    const handleHomewardData = (multiData) => {
-        console.log(multiData);
+    const handleHomewardData = (multiData, e, multi) => {
+        if (e) {
+            e.preventDefault()
+        }
+        execute4({
+            data: {
+                nim: JSON.stringify(multiData),
+                time: multi? currentTime.toISOString(): outTime.toISOString()
+            }
+        })
+        setModalOpen(false)
     }
 
-    const handleModalAcc = () => {
-        if (homeward) {
-            //add homeward function
-        } else {
-            setAlertOpen(true)
-            //add comin function
-        }
+    const handleModalAcc = (e) => {
+        e.preventDefault()
+        execute3({
+            data: {
+                nim: JSON.stringify(personName)
+            }
+        })
         setModalOpen(false)
+
 
     }
 
     const handleModalCancel = () => {
-        if (homeward) {
-            //add homeward function
-        } else {
-            //add comin function
-        }
+        setModalOpen(false)
     }
 
     const handleChangeDate = (value) => {
         setDateValue(value)
+        execute1({
+            params: {
+                date: shortDateFormater(formatLocalDateISO(value.toISOString()))
+            }
+        })
     }
 
     const handleDeleteData = (multiData, singleData) => {
-        setDialogOpen(true)
         setDialogTitle(language?.delete)
         if (multiData) {
-            console.log(multiData);
+            setDialogContent(`${language?.delete} ${multiData.length} item ${language?.on} ${dateFormater(dateValue.toISOString(), language?.timeRegion)}?`)
+            setDialogData(multiData)
             //handle multiple data
         } else {
-            console.log(singleData);
+            setDialogContent(`${language?.delete} ${singleData} ${language?.on} ${dateFormater(dateValue.toISOString(), language?.timeRegion)}?`)
+            setDialogData([singleData])
             //handle singgle data
         }
+        setDialogOpen(true)
     }
 
 
     const handleDialonAcc = () => {
-
+        execute5({
+            data: {
+                nim: JSON.stringify(dialogData),
+                date: shortDateFormater(formatLocalDateISO(dateValue.toISOString()))
+            },
+        })
+        setDialogOpen(false)
     }
 
     const handleDialogCancle = () => {
+        setDialogOpen(false)
 
     }
 
     useEffect(() => {
-        document.title = `${language?.calasAtd} - Lab ICT Presensi`
-    }, [language?.calasAtd])
+        if (timeStamp) {
+            setServerTime(new Date(timeStamp))
+            setCurrentTime(moment(new Date(timeStamp)))
+            setAttendanceTime(moment(new Date(timeStamp)))
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [timeStamp])
+
+    useEffect(() => {
+        if (data3) {
+            execute1()
+            setAlertOpen(true)
+            setAlertContent({
+                title: language?.scssAdd,
+                severity: 'success',
+                content:''
+            })
+            setPersonName([])
+            // setAlertOpen(true)
+            //handle scss post
+        }
+        if (data4) {
+            execute1()
+            setAlertOpen(true)
+            setAlertContent({
+                title: language?.scssEdit,
+                severity: 'success',
+                content:''
+            })
+            //handle scss put
+        }
+        if (data5) {
+            execute1()
+            setAlertOpen(true)
+            setAlertContent({
+                title: language?.scssDelete,
+                severity: 'success',
+                content:''
+            })
+            //handle scss delete
+        }
+        if (error1) {
+            console.error(error1)
+            setAlertOpen(true)
+            setAlertContent({
+                title: language?.failGet,
+                severity: 'error',
+                content:''
+            })
+            //handle error get
+        }
+        if (error3) {
+            //handle error post
+            console.error(error3);
+            setAlertOpen(true)
+            setAlertContent({
+                title: language?.failGet,
+                severity: 'error',
+                content:language?.failAttd
+            })
+        }
+        if (error4) {
+            //handle error put
+            console.error(error3);
+            setAlertOpen(true)
+            setAlertContent({
+                title: language?.failGet,
+                severity: 'error',
+                content:language?.failOut
+            })
+        }
+        if (error5) {
+            //handle error delete
+            console.error(error5);
+            setAlertOpen(true)
+            setAlertContent({
+                title: language?.failGet,
+                severity: 'error',
+                content:''
+            })
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data3, data4, data5, error1, error3, error4, error5])
+
+    useEffect(() => {
+        if (data1) {
+            const mainData = calculateLate(data1?.data.filter(item => item.jabatan === "Calon Asisten"), 7,30)
+            setTableData(mainData?.filter(item => item.waktu_datang !== null))
+            setModalData(mainData?.filter(item => item.waktu_datang === null))
+            setRecapData({
+                present: mainData?.filter(item => item.waktu_datang !== null).length,
+                notpresent: mainData?.filter(item => item.waktu_datang === null).length,
+                late: mainData.filter(item => item.terlambat !== 0 && item.waktu_datang !== null).length,
+                onTime: mainData.filter(item => item.terlambat === 0 && item.waktu_datang !== null).length
+            })
+        }
+    }, [data1])
+
+
+    useEffect(() => {
+        document.title = `${language?.assistantAtd} - Lab ICT Presensi`
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [language?.assistantAtd])
 
     return (
         <>
             <Container sx={{ py: 5, minHeight: '91.5vh' }}>
                 <Card >
-                    <CardContent sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                    <CardContent sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', py: 2 }}>
                         <Typography variant="h4">{language?.calasAtd_l}</Typography>
+                        <Typography variant="h5">{dateFormater(dateValue.toISOString(), language?.timeRegion)}</Typography>
+
                     </CardContent>
                 </Card>
                 <Box sx={{ display: 'flex', my: 2, flexWrap: { xs: 'wrap', md: 'nowrap' }, justifyContent: 'space-between' }}>
@@ -135,21 +288,23 @@ const CALASAttendancePage = () => {
                                     handleRowClick={handleRowClick}
                                     handleHomewardData={handleHomewardData}
                                     handleDeleteData={handleDeleteData}
+                                    data={tableData}
                                 />
                             )}
                         </CardContent>
                     </Card>
                     <Box sx={{ ml: { xs: 'auto', md: 2 }, my: { xs: 2, md: 0 }, width: { xs: '100%', md: '30%' } }}>
-                        <AttendanceRecapCard language={language} loading={loading} label={language?.calas_s} />
-                        <CurrentDateCard language={language} setCurrTime={setCurrentTime} serverDate={serverDate} />
-                        <AttendanceChangeDateCard title={language?.changeDateAtd} language={language} readOnly={!isAuthenticated} currDate={{ dateValue }} handleChangeDate={handleChangeDate} />
+                        <AttendanceRecapCard loading={loading} label={language?.calas_s} language={language} data={recapData} />
+                        <CurrentDateCard serverDate={serverTime} language={language} />
+                        <AttendanceChangeDateCard title={language?.changeDateAtd} readOnly={!isAuthenticated} language={language} currDate={{ dateValue }} handleChangeDate={handleChangeDate} />
                     </Box>
                 </Box>
             </Container>
             <AlertMain
-                alertLabel='test'
-                severity='success'
+                alertLabel={ alertContent.title}
+                severity={alertContent.severity}
                 open={alertOpen}
+                content={alertContent.content}
                 onClose={() => setAlertOpen(false)}
                 anchorPosition={{ vertical: 'bottom', horizontal: 'center' }}
             />
@@ -162,9 +317,13 @@ const CALASAttendancePage = () => {
                     language={language}
                     onAccept={handleModalAcc}
                     onCancle={handleModalCancel}
-                    onTimeChange={setAttendanceTime}
-                    timeValue={attendanceTime}
+                    onTimeChange={(timeChange) => homeward ? setOutTime(timeChange) : setAttendanceTime(timeChange)}
+                    timeValue={homeward ? outTime : attendanceTime}
                     homeward={homeward}
+                    data={homeward ? homewardData : modalData}
+                    personName={personName}
+                    handlePut={handleHomewardData}
+                    setPersonName={setPersonName}
                 />
             </ModalMain>
             <DialogAlertMain
@@ -175,7 +334,7 @@ const CALASAttendancePage = () => {
                 handleCancle={handleDialogCancle}
 
             >
-                lalalala
+                {dialogContent}
 
             </DialogAlertMain>
 
@@ -183,4 +342,4 @@ const CALASAttendancePage = () => {
     )
 }
 
-export default CALASAttendancePage
+export default AssistantAttendancePage

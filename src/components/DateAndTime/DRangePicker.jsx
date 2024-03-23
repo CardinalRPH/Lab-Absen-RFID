@@ -4,9 +4,9 @@ import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"
 import DesktopDPicker from "./DesktopDPicker"
 
-const defaultMidDivider = <Typography variant="h4"  color='text.primary'>-</Typography>
+const defaultMidDivider = <Typography variant="h4" color='text.primary'>-</Typography>
 
-const DRangePicker = ({ label, disableFuture = false, handleDateChange, dateValue, midDivider = defaultMidDivider, required, required1, required2 }) => {
+const DRangePicker = ({ label, disableFuture = false, handleDateChange, dateValue, midDivider = defaultMidDivider, required, required1, required2, readOnly = false }) => {
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -18,6 +18,7 @@ const DRangePicker = ({ label, disableFuture = false, handleDateChange, dateValu
                         dateValue={dateValue && dateValue[Object.keys(dateValue)[0]]}
                         handleChangeDate={value => dateValue && handleDateChange(value, Object.keys(dateValue)[0])}
                         required={required || required1}
+                        readOnly={readOnly}
                     />
                 </Box>
                 <Box sx={{ m: 1 }}>
@@ -30,6 +31,7 @@ const DRangePicker = ({ label, disableFuture = false, handleDateChange, dateValu
                         dateValue={dateValue && dateValue[Object.keys(dateValue)[1]]}
                         handleChangeDate={value => dateValue && handleDateChange(value, Object.keys(dateValue)[1])}
                         required={required || required2}
+                        readOnly={readOnly}
                     />
                 </Box>
             </Box>

@@ -3,6 +3,7 @@ import { Box, Tab, Tabs, Typography } from "@mui/material"
 import { BarChart, PieChart } from "@mui/x-charts";
 import { useState } from "react";
 import RootLoading from "./RootLoading";
+import chartFormater from "../utilities/chartFormater";
 
 const CustomTabPanel = (props) => {
     const { children, value, index, ...other } = props;
@@ -45,7 +46,22 @@ const barChartSetting = (lang) => {
 };
 const valueFormatter = (value) => `${value} Asisten`;
 
+const dataKeyFormater = (value) => {
+    const formattedKeys = Object.keys(value ||[])
+        .filter(key => key !== 'name')
+        .map(dataKey => ({
+            dataKey,
+            label: dataKey.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' \n'),
+            valueFormatter
+        }));
+
+    return formattedKeys
+}
+
+
 const TabsChartComponent = ({ data, loading, language }) => {
+
+    const formatedData = chartFormater(data || [])
 
     const [value, setValue] = useState(0);
 
@@ -66,98 +82,36 @@ const TabsChartComponent = ({ data, loading, language }) => {
                     </Box>
                     <CustomTabPanel value={value} index={0}>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                            <BarChart
-                                dataset={data.fakultas.fti.data}
-                                xAxis={[{ scaleType: 'band', dataKey: 'name' }]}
-                                series={[
-                                    { dataKey: 'teknik_informatika', label: 'Teknik \nInformatika', valueFormatter },
-                                    { dataKey: 'sistem_informasi', label: 'Sistem \nInformasi', valueFormatter },
-                                    { dataKey: 'sistem_komputer', label: 'Sistem \nKomputer', valueFormatter },
-                                ]}
-                                slotProps={{
-                                    legend: {
-                                        direction: 'column',
-                                        position: { vertical: 'middle', horizontal: 'right' },
-                                    },
-                                }}
-                                margin={{
-                                    left: 40,
-                                    right: 155,
-                                    top: 80,
-                                    bottom: 80,
-                                }}
-                                {...barChartSetting(language)}
-                            />
-                            <BarChart
-                                dataset={data.fakultas.fe.data}
-                                xAxis={[{ scaleType: 'band', dataKey: 'name' }]}
-                                series={[
-                                    { dataKey: 'managemen', label: 'Managemen', valueFormatter },
-                                    { dataKey: 'akuntansi', label: 'Akuntansi', valueFormatter },
-                                ]}
-                                slotProps={{
-                                    legend: {
-                                        direction: 'column',
-                                        position: { vertical: 'middle', horizontal: 'right' },
-                                    },
-                                }}
-                                margin={{
-                                    left: 40,
-                                    right: 155,
-                                    top: 80,
-                                    bottom: 80,
-                                }}
-                                {...barChartSetting(language)}
-                            />
-                            <BarChart
-                                dataset={data.fakultas.ft.data}
-                                xAxis={[{ scaleType: 'band', dataKey: 'name' }]}
-                                series={[
-                                    { dataKey: 'arsitektur', label: 'Arsitektur', valueFormatter },
-                                    { dataKey: 'teknik_lektro', label: 'Teknik \nElektro', valueFormatter },
-                                ]}
-                                slotProps={{
-                                    legend: {
-                                        direction: 'column',
-                                        position: { vertical: 'middle', horizontal: 'right' },
-                                    },
-                                }}
-                                margin={{
-                                    left: 40,
-                                    right: 155,
-                                    top: 80,
-                                    bottom: 80,
-                                }}
-                                {...barChartSetting(language)}
-                            />
-                            <BarChart
-                                dataset={data.fakultas.fisip.data}
-                                xAxis={[{ scaleType: 'band', dataKey: 'name' }]}
-                                series={[
-                                    { dataKey: 'hubungan_internasional', label: 'Hubungan \nInternasional', valueFormatter },
-                                    { dataKey: 'kriminologi', label: 'Kriminologi', valueFormatter },
-                                ]}
-                                slotProps={{
-                                    legend: {
-                                        direction: 'column',
-                                        position: { vertical: 'middle', horizontal: 'right' },
-                                    },
-                                }}
-                                margin={{
-                                    left: 40,
-                                    right: 155,
-                                    top: 80,
-                                    bottom: 80,
-                                }}
-                                {...barChartSetting(language)}
-                            />
+                            {
+                                Object.keys(formatedData?.fakultas).map((item, index) => (
+                                    <BarChart
+                                        key={index}
+                                        dataset={formatedData?.fakultas[item].data}
+                                        xAxis={[{ scaleType: 'band', dataKey: 'name' }]}
+                                        series={dataKeyFormater(formatedData?.fakultas[item].data[0])}
+                                        slotProps={{
+                                            legend: {
+                                                direction: 'column',
+                                                position: { vertical: 'middle', horizontal: 'right' },
+                                            },
+                                        }}
+                                        margin={{
+                                            left: 40,
+                                            right: 155,
+                                            top: 80,
+                                            bottom: 80,
+                                        }}
+                                        {...barChartSetting(language)}
+                                    />
+                                ))
+                            }
                         </Box>
 
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={1}>
                         <PieChart
                             series={[{
-                                ...data.jenis_kelamin,
+                                ...formatedData?.jenis_kelamin,
                                 innerRadius: 30,
                                 outerRadius: 100,
                                 paddingAngle: 2,
@@ -183,12 +137,12 @@ const TabsChartComponent = ({ data, loading, language }) => {
                                 bottom: 50,
                             }}
                         />
-                        <Typography sx={{ margin: 2 }}>{`Total ${data.jenis_kelamin.total} ${language?.assistant}`}</Typography>
+                        <Typography sx={{ margin: 2 }}>{`Total ${formatedData?.jenis_kelamin.total} ${language?.assistant}`}</Typography>
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={2}>
                         <PieChart
                             series={[{
-                                ...data.tahun_masuk,
+                                ...formatedData?.tahun_masuk,
                                 innerRadius: 30,
                                 outerRadius: 100,
                                 paddingAngle: 2,
@@ -215,12 +169,12 @@ const TabsChartComponent = ({ data, loading, language }) => {
                                 bottom: 50,
                             }}
                         />
-                        <Typography sx={{ margin: 2 }}>{`Total ${data.tahun_masuk.total} ${language?.assistant}`}</Typography>
+                        <Typography sx={{ margin: 2 }}>{`Total ${formatedData?.tahun_masuk.total} ${language?.assistant}`}</Typography>
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={3}>
                         <PieChart
                             series={[{
-                                ...data.jabatan,
+                                ...formatedData?.jabatan,
                                 innerRadius: 30,
                                 outerRadius: 100,
                                 paddingAngle: 2,
@@ -248,7 +202,7 @@ const TabsChartComponent = ({ data, loading, language }) => {
                             }}
 
                         />
-                        <Typography sx={{ margin: 2 }}>{`Total ${data.jabatan.total} ${language?.assistant}`}</Typography>
+                        <Typography sx={{ margin: 2 }}>{`Total ${formatedData?.jabatan.total} ${language?.assistant}`}</Typography>
                     </CustomTabPanel>
                 </>
             )}

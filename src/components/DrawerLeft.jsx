@@ -8,16 +8,18 @@ import imagePatternB from "../assets/imagePaternB.jpg"
 import imagePatternW from "../assets/imagePaternW.png"
 import { enLang, idLang } from "../utilities/LanguageTextConfig"
 import { langAction } from "../stores/langState"
+import { useNavigate } from "react-router-dom"
 
 
 
-const DrawerLeft = ({ drawerStates }) => {
+const DrawerLeft = ({ drawerStates, setDialogOpen }) => {
     const { drawerState = false, toggleDrawer } = drawerStates
     const dispatch = useDispatch()
     const { isDarkMode } = useSelector(state => state.themes)
     const { isEnLang } = useSelector(state => state.languages)
     const language = isEnLang ? enLang : idLang
-    const { isAuthenticated } = useSelector(state => state.auths)
+    const { isAuthenticated, payload } = useSelector(state => state.auths)
+    const navigate = useNavigate()
 
     const pages = [
         {
@@ -53,7 +55,8 @@ const DrawerLeft = ({ drawerStates }) => {
     ]
 
     const handleLogout = () => {
-
+        toggleDrawer(false)
+        setDialogOpen(true)
     }
 
     return (
@@ -74,7 +77,7 @@ const DrawerLeft = ({ drawerStates }) => {
                                             <ListItemAvatar>
                                                 <Avatar>R</Avatar>
                                             </ListItemAvatar>
-                                            <ListItemText primary={'Roki Gerung'} secondary={'roki@gerung.com'} />
+                                            <ListItemText primary={payload?.name} secondary={payload?.nim} />
                                         </>
 
                                     ) : (
@@ -90,7 +93,7 @@ const DrawerLeft = ({ drawerStates }) => {
                         {pages.map((item, index) => (
                             !item.private && (
                                 <ListItem key={index}>
-                                    <ListItemButton href={item.link}>
+                                    <ListItemButton onClick={()=>navigate(item.link)}>
                                         <ListItemIcon>
                                             <FontAwesomeIcon size="xl" icon={item.icon} />
                                         </ListItemIcon>
@@ -105,7 +108,7 @@ const DrawerLeft = ({ drawerStates }) => {
                     <List>
                         {isAuthenticated && (
                             <ListItem>
-                                <ListItemButton href="/devices">
+                                <ListItemButton onClick={()=>navigate("/devices")}>
                                     <ListItemIcon>
                                         <FontAwesomeIcon size="xl" icon={faQrcode} />
                                     </ListItemIcon>

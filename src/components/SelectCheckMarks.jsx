@@ -1,5 +1,4 @@
 import { Checkbox, FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Select } from "@mui/material";
-import { useState } from "react";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -12,23 +11,8 @@ const MenuProps = {
     },
 };
 
-const names = [
-    'Oliver Hansen',
-    'Van Henry',
-    'April Tucker',
-    'Ralph Hubbard',
-    'Omar Alexander',
-    'Carlos Abbott',
-    'Miriam Wagner',
-    'Bradley Wilkerson',
-    'Virginia Andrews',
-    'Kelly Snyder',
-];
-
-
 // eslint-disable-next-line react/prop-types
-const SelectCheckMarks = ({ label, sx }) => {
-    const [personName, setPersonName] = useState([]);
+const SelectCheckMarks = ({ label, sx, data = [], dataPathValue, dataPathLabel, personName = [], setPersonName, required = false, readOnly = false }) => {
 
     const handleChange = (event) => {
         const {
@@ -53,11 +37,13 @@ const SelectCheckMarks = ({ label, sx }) => {
                     input={<OutlinedInput label={label} />}
                     renderValue={(selected) => selected.join(', ')}
                     MenuProps={MenuProps}
+                    required={required}
+                    readOnly={readOnly}
                 >
-                    {names.map((name) => (
-                        <MenuItem key={name} value={name}>
-                            <Checkbox checked={personName.indexOf(name) > -1} />
-                            <ListItemText primary={name} />
+                    {data.map((name, index) => (
+                        <MenuItem key={index} value={dataPathValue(name)}>
+                            <Checkbox checked={personName?.indexOf(dataPathValue(name)) > -1} />
+                            <ListItemText primary={dataPathLabel(name)} />
                         </MenuItem>
                     ))}
                 </Select>

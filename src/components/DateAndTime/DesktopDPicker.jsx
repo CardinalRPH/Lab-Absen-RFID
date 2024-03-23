@@ -2,7 +2,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"
 
 // eslint-disable-next-line react/prop-types
-const DesktopDPicker = ({ label, disableFuture = false, handleChangeDate, dateValue, maxDate, required }) => {
+const DesktopDPicker = ({ label, disableFuture = false, handleChangeDate, dateValue, maxDate, required = false, readOnly = false }) => {
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <DatePicker
@@ -17,6 +17,7 @@ const DesktopDPicker = ({ label, disableFuture = false, handleChangeDate, dateVa
                         required: required
                     }
                 }}
+                readOnly={readOnly}
             />
         </LocalizationProvider>
     )

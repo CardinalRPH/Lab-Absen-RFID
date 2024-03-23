@@ -1,42 +1,29 @@
 /* eslint-disable react/prop-types */
 import { Box, Card, CardContent, Skeleton, Typography } from "@mui/material"
-import moment from "moment"
 import { useEffect, useState } from "react"
 
-const CurrentDateCard = ({ serverDate, language, setCurrTime }) => {
-    const [time, setTime] = useState(new Date(serverDate))
-
-    const currentTime = new Date()
-    const diffDate = serverDate?.getTime() - currentTime.getTime()
+const CurrentDateCard = ({ serverDate, language }) => {
 
 
-
-    const hours = time.getHours();
-    const minutes = time.getMinutes();
-    const seconds = time.getSeconds();
-
-    const days = time.getDate()
-    const months = time.getMonth() + 1
-    const years = time.getFullYear()
-
-    const hoursFormated = hours < 10 ? `0${hours}` : hours
-    const minutesFormated = minutes < 10 ? `0${minutes}` : minutes
-    const secondsFormated = seconds < 10 ? `0${seconds}` : seconds
-
-    const daysFormated = days < 10 ? `0${days}` : days
-    const monthsFormated = months < 10 ? `0${months}` : months
+    const [formatedTime, setFormatedTime] = useState({
+        secondsFormated: serverDate.getSeconds() < 10 ? `0${serverDate.getSeconds()}` : serverDate.getSeconds(),
+        minutesFormated: serverDate.getMinutes() < 10 ? `0${serverDate.getMinutes()}` : serverDate.getMinutes(),
+        hoursFormated: serverDate.getHours() < 10 ? `0${serverDate.getHours()}` : serverDate.getHours(),
+        daysFormated: serverDate.getDate() < 10 ? `0${serverDate.getDate()}` : serverDate.getDate(),
+        monthsFormated: serverDate.getMonth() + 1 < 10 ? `0${serverDate.getMonth()}` : serverDate.getMonth(),
+        yearsFormated: serverDate.getFullYear()
+    })
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            const now = new Date();
-            const nextUpdate = now.getTime() + diffDate
-            setTime(new Date(nextUpdate));
-            setCurrTime(moment(new Date(nextUpdate)))
-        }, 1000);
-        return () => clearInterval(intervalId);
-    }, [diffDate, setCurrTime]);
-
-
+        setFormatedTime({
+            secondsFormated: serverDate.getSeconds() < 10 ? `0${serverDate.getSeconds()}` : serverDate.getSeconds(),
+            minutesFormated: serverDate.getMinutes() < 10 ? `0${serverDate.getMinutes()}` : serverDate.getMinutes(),
+            hoursFormated: serverDate.getHours() < 10 ? `0${serverDate.getHours()}` : serverDate.getHours(),
+            daysFormated: serverDate.getDate() < 10 ? `0${serverDate.getDate()}` : serverDate.getDate(),
+            monthsFormated: serverDate.getMonth() + 1 < 10 ? `0${serverDate.getMonth()}` : serverDate.getMonth(),
+            yearsFormated: serverDate.getFullYear()
+        })
+    }, [serverDate])
 
     return (
         <Card sx={{ my: 2 }}>
@@ -44,10 +31,10 @@ const CurrentDateCard = ({ serverDate, language, setCurrTime }) => {
                 <Typography>{language?.dateNow}</Typography>
                 <Box sx={{ my: 2, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
                     <Typography variant="h4">
-                        {serverDate ? `${hoursFormated}:${minutesFormated}:${secondsFormated}` : <Skeleton sx={{ minWidth: 200 }} />}
+                        {serverDate ? `${formatedTime.hoursFormated}:${formatedTime.minutesFormated}:${formatedTime.secondsFormated}` : <Skeleton sx={{ minWidth: 200 }} />}
                     </Typography>
                     <Typography>
-                        {serverDate ? `${daysFormated}/${monthsFormated}/${years}` : <Skeleton sx={{ minWidth: 100 }} />}
+                        {serverDate ? `${formatedTime.daysFormated}/${formatedTime.monthsFormated}/${formatedTime.yearsFormated}` : <Skeleton sx={{ minWidth: 100 }} />}
                     </Typography>
                 </Box>
 

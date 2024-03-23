@@ -5,10 +5,10 @@ import TextFieldPassword from "../TextFieldPassword"
 
 // eslint-disable-next-line react/prop-types
 const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm, handler, modalTitler, language }) => {
-    const { handleDeleteData, handleDisableData, handleEditData, handleSaveData } = handler
+    const { handleDeleteData, handleDisableData, handleEditData, handleSaveData, handleEnableData } = handler
     const { setModalTitle, modalTitle } = modalTitler
     const [readOnlyInput, setReadOnlyInput] = useState(false)
-    const [emailValidator, setEmailValidator] = useState(false)
+    // const [emailValidator, setEmailValidator] = useState(false)
     const [purpose, setPurpose] = useState(purposer)
 
     const handleInputNumber = (event) => {
@@ -16,13 +16,13 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
         handleInputChange({ target: { name: event.target.name, value: cleanedValue } })
     }
 
-    const handleInputEmail = (event) => {
-        const inputValue = event.target.value;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const isValid = emailRegex.test(inputValue);
-        setEmailValidator(!isValid)
-        handleInputChange(event)
-    }
+    // const handleInputEmail = (event) => {
+    //     const inputValue = event.target.value;
+    //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //     const isValid = emailRegex.test(inputValue);
+    //     setEmailValidator(!isValid)
+    //     handleInputChange(event)
+    // }
 
     const handleInputChange = (event) => {
         setInputForm(prevState => ({
@@ -39,8 +39,9 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
             name: '',
             gender: '',
             position: '',
-            cardId: '',
-            password: ''
+            card_no: '',
+            password: '',
+            status: ''
         })
     }
 
@@ -69,12 +70,12 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
         <Box component={purpose === 'view' ? undefined : 'form'} onSubmit={(event) => purpose === 'add' ? handleSaveData(event) : handleEditData(event, inputForm.nim)}>
             <Box sx={{ display: 'flex', minWidth: { xs: 'auto', md: 800 }, my: 1 }}>
                 <Box sx={{ width: '50%', display: 'flex', flexDirection: 'column', mr: 2 }}>
-                    <TextField value={inputForm.nim} name="nim" sx={{ my: 1 }} onChange={handleInputNumber} id="standard-basic" label="NIM" variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
-                    <TextField value={inputForm.email} onChange={handleInputEmail} type='email' name="email" sx={{ my: 1 }} id="standard-basic" label={language?.email} variant="standard" required inputProps={{ readOnly: readOnlyInput }} error={emailValidator} />
-                    <TextField value={inputForm.phone} name="phone" sx={{ my: 1 }} onChange={handleInputNumber} id="standard-basic" label={language?.phoneNumber} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
+                    <TextField value={inputForm.nim} name="nim" sx={{ my: 1 }} onChange={handleInputNumber} label="NIM" variant="standard" required inputProps={{ readOnly: purpose === 'add' ? false : true }} />
+                    {/* <TextField value={inputForm.email} onChange={handleInputEmail} type='email' name="email" sx={{ my: 1 }}  label={language?.email} variant="standard" required inputProps={{ readOnly: readOnlyInput }} error={emailValidator} /> */}
+                    <TextField value={inputForm.phone} name="phone" sx={{ my: 1 }} onChange={handleInputNumber} label={language?.phoneNumber} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
                 </Box>
                 <Box sx={{ width: '50%', display: 'flex', flexDirection: 'column', ml: 2 }}>
-                    <TextField name="name" onChange={handleInputChange} value={inputForm.name} sx={{ my: 1 }} id="standard-basic" label={language?.fullName} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
+                    <TextField name="name" onChange={handleInputChange} value={inputForm.name} sx={{ my: 1 }} label={language?.fullName} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
                     <FormControl sx={{ my: 1 }}>
                         <FormLabel id='radio-buttons-group-label'>{language?.gender}</FormLabel>
                         <RadioGroup
@@ -84,15 +85,18 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
                             value={inputForm.gender}
                             onChange={handleInputChange}
                             defaultValue='laki-laki'>
-                            <FormControlLabel value="laki-laki" control={<Radio />} label={language?.male} componentsProps={{ typography: { color: 'text.secondary' } }} disabled={readOnlyInput} required />
-                            <FormControlLabel value="perempuan" control={<Radio />} label={language?.female} componentsProps={{ typography: { color: 'text.secondary' } }} disabled={readOnlyInput} required />
+                            <FormControlLabel value="Laki-laki" control={<Radio />} label={language?.male} componentsProps={{ typography: { color: 'text.secondary' } }} disabled={readOnlyInput} required />
+                            <FormControlLabel value="Perempuan" control={<Radio />} label={language?.female} componentsProps={{ typography: { color: 'text.secondary' } }} disabled={readOnlyInput} required />
                         </RadioGroup>
                     </FormControl>
-                    {inputForm.position !== 'calonAsisten' && (
-                        <TextField name="cardId" onChange={handleInputChange} value={inputForm.cardId} sx={{ my: 1 }} id="standard-basic" label={language?.cardSerialNumber} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
-                    )}
+                    {/* {inputForm.position !== 'calonAsisten' && (
+                        <TextField name="cardId" onChange={handleInputChange} value={inputForm.cardId} sx={{ my: 1 }}  label={language?.cardSerialNumber} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
+                    )} */}
                 </Box>
             </Box>
+            {inputForm.position !== 'Calon Asisten' && (
+                <TextField fullWidth name="card_no" onChange={handleInputChange} value={inputForm.card_no || ""} sx={{ my: 1 }} label={language?.cardSerialNumber} variant="standard" required inputProps={{ readOnly: readOnlyInput }} />
+            )}
             <FormControl fullWidth sx={{ my: 1 }} required>
                 <InputLabel id="demo-simple-select-label">{language?.position}</InputLabel>
                 <Select
@@ -104,13 +108,13 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
                     onChange={handleInputChange}
                     inputProps={{ readOnly: readOnlyInput }}
                 >
-                    <MenuItem value='calonAsisten'>{language?.calas_l}</MenuItem>
-                    <MenuItem value='asisten'>{language?.assistant}</MenuItem>
-                    <MenuItem value='spv'>SPV</MenuItem>
+                    <MenuItem value='Calon Asisten'>{language?.calas_l}</MenuItem>
+                    <MenuItem value='Asisten'>{language?.assistant}</MenuItem>
+                    <MenuItem value='Supervisor'>SPV</MenuItem>
                 </Select>
             </FormControl>
-            {inputForm.position === 'spv' && (
-                <TextFieldPassword name='password' variant="standard" label={language?.password} onChange={handleInputChange} value={inputForm.password} readOnly={readOnlyInput} />
+            {inputForm.position === 'Supervisor' && (
+                <TextFieldPassword name='password' variant="standard" label={language?.password} onChange={handleInputChange} value={inputForm.password} readOnly={readOnlyInput} required={false} />
 
             )}
             <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
@@ -119,8 +123,12 @@ const AsistenCalasRenderModal = ({ purposer, modalSeter, inputForm, setInputForm
                     <>
 
                         <Button variant="contained" sx={{ mx: 1 }} onClick={() => modalSeter(false)} >{language?.cancel}</Button>
-                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleDeleteData()}>{language?.delete}</Button>
-                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleDisableData()}>{language?.disableIt}</Button>
+                        <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleDeleteData(false, inputForm?.nim)}>{language?.delete}</Button>
+                        {inputForm?.status === "Aktif" ? (
+                            <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleDisableData(false, inputForm?.nim)}>{language?.disableIt}</Button>
+                        ) : (
+                            <Button variant="contained" sx={{ mx: 1 }} onClick={() => handleEnableData(false, inputForm?.nim)}>{language?.enableit}</Button>
+                        )}
                         <Button variant="contained" onClick={() => setPurpose('edit')} sx={{ mx: 1 }}>{language?.edit}</Button>
                     </>
                 )}

@@ -2,67 +2,7 @@
 import { faTrash, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, Checkbox, ListItemIcon, ListItemText, Menu, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Toolbar, Typography, alpha } from "@mui/material";
-import { useMemo, useState } from "react";
-
-const createData = (id, name, calories, fat, carbs, protein) => {
-    return {
-        id,
-        name,
-        calories,
-        fat,
-        carbs,
-        protein,
-    };
-}
-
-const rows = [
-    createData(1, 'Cupcake', 305, 3.7, 67, 4.3),
-    createData(2, 'Donut', 452, 25.0, 51, 4.9),
-    createData(3, 'Eclair', 262, 16.0, 24, 6.0),
-    createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData(5, 'Gingerbread', 356, 16.0, 49, 3.9),
-    createData(6, 'Honeycomb', 408, 3.2, 87, 6.5),
-    createData(7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-    createData(9, 'KitKat', 518, 26.0, 65, 7.0),
-    createData(10, 'Lollipop', 392, 0.2, 98, 0.0),
-    createData(11, 'Marshmallow', 318, 0, 81, 2.0),
-    createData(12, 'Nougat', 360, 19.0, 9, 37.0),
-    createData(13, 'Oreo', 437, 18.0, 63, 4.0),
-];
-
-const headCells = [
-    {
-        id: 'name',
-        numeric: false,
-        disablePadding: true,
-        label: 'Dessert (100g serving)',
-    },
-    {
-        id: 'calories',
-        numeric: true,
-        disablePadding: false,
-        label: 'Calories',
-    },
-    {
-        id: 'fat',
-        numeric: true,
-        disablePadding: false,
-        label: 'Fat (g)',
-    },
-    {
-        id: 'carbs',
-        numeric: true,
-        disablePadding: false,
-        label: 'Carbs (g)',
-    },
-    {
-        id: 'protein',
-        numeric: true,
-        disablePadding: false,
-        label: 'Protein (g)',
-    },
-];
+import { useEffect, useMemo, useState } from "react";
 
 const EnhancedTableToolbar = ({ numSelected, searchChange, isDateSame, handleHomewardData, handleDeleteData, selected, language }) => {
 
@@ -91,7 +31,7 @@ const EnhancedTableToolbar = ({ numSelected, searchChange, isDateSame, handleHom
             {numSelected > 0 ? (
                 <Box sx={{ display: 'flex' }}>
                     {isDateSame && (
-                        <Button variant="contained" color="warning" sx={{ mx: 1 }} onClick={() => handleHomewardData(selected)}>
+                        <Button variant="contained" color="warning" sx={{ mx: 1 }} onClick={() => handleHomewardData(selected, false, true)}>
                             <FontAwesomeIcon size="lg" icon={faUserSlash} />
                             <Typography sx={{ mx: 1 }}>{language?.getHome}</Typography>
                         </Button>
@@ -103,7 +43,7 @@ const EnhancedTableToolbar = ({ numSelected, searchChange, isDateSame, handleHom
                 </Box>
 
             ) : (
-                <TextField id="outlined-basic" label={language?.search} variant="standard" onChange={searchChange} />
+                <TextField id="outlined-basic" label={`${language?.search} ${language?.name}`} variant="standard" onChange={searchChange} />
             )}
         </Toolbar>
     );
@@ -111,11 +51,44 @@ const EnhancedTableToolbar = ({ numSelected, searchChange, isDateSame, handleHom
 
 const EnhancedTableHead = (props) => {
     // eslint-disable-next-line react/prop-types
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, language } =
         props;
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
     };
+
+    const headCells = [
+        {
+            id: 'nim',
+            numeric: false,
+            disablePadding: false,
+            label: 'NIM',
+        },
+        {
+            id: 'nama',
+            numeric: false,
+            disablePadding: false,
+            label: language?.name
+        },
+        {
+            id: 'waktu_datang',
+            numeric: false,
+            disablePadding: false,
+            label: language?.cameTime
+        },
+        {
+            id: 'waktu_pulang',
+            numeric: false,
+            disablePadding: false,
+            label: language?.returnTime
+        },
+        {
+            id: 'terlambat',
+            numeric: false,
+            disablePadding: false,
+            label: language?.late
+        },
+    ];
 
     return (
         <TableHead>
@@ -156,9 +129,9 @@ const EnhancedTableHead = (props) => {
 }
 
 // eslint-disable-next-line react/prop-types
-const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDeleteData, language, isDateSame }) => {
+const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDeleteData, language, isDateSame, data = [] }) => {
     const [selected, setSelected] = useState([]);
-    const [tempData, setTempData] = useState(rows)
+    const [tempData, setTempData] = useState(data)
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selectedRow, setSelectedRow] = useState(null)
@@ -167,14 +140,14 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDe
     const handleSearchChange = (event) => {
         const searchText = event.target.value
         // console.log(searchText);
-        setTempData(rows.filter(item => item.name.toLowerCase().includes(searchText.toLowerCase())))
+        setTempData(data.filter(item => item.nama.toLowerCase().includes(searchText.toLowerCase())))
     }
 
     const isSelected = (id) => selected.indexOf(id) !== -1;
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = tempData.map((n) => n.id);
+            const newSelected = tempData.map((n) => n.nim);
             setSelected(newSelected);
             return;
         }
@@ -182,7 +155,6 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDe
     };
 
     const handleRequestSort = (event, property) => {
-        console.log(property);
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
@@ -246,7 +218,7 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDe
     const handleMenuOpen = (event, id) => {
         event.preventDefault()
         setPointerPosition(event.target)
-        setSelectedRow(id)
+        setSelectedRow(data?.find(item => item.nim === id))
 
     }
 
@@ -256,9 +228,13 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDe
     }
 
     const handleMenuDelete = () => {
-        handleDeleteData(false, selectedRow)
+        handleDeleteData(false, selectedRow?.nim)
         handleMenuClose()
     }
+
+    useEffect(() => {
+       setTempData(data) 
+    },[data])
 
     return (
         <Box>
@@ -280,19 +256,20 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDe
                         onSelectAllClick={handleSelectAllClick}
                         onRequestSort={handleRequestSort}
                         rowCount={tempData.length}
+                        language={language}
                     />
                     <TableBody>
                         {visibleRows.map((row, index) => {
-                            const isItemSelected = isSelected(row.id);
+                            const isItemSelected = isSelected(row.nim);
                             const labelId = `enhanced-table-checkbox-${index}`;
                             return (
                                 <TableRow
                                     hover
-                                    onClick={() => handleRowClick(row.id)}
-                                    onContextMenu={(e) => handleMenuOpen(e, row.id)}
+                                    onClick={() => handleRowClick(row.nim)}
+                                    onContextMenu={(e) => handleMenuOpen(e, row.nim)}
                                     role="checkbox"
                                     aria-checked={isItemSelected}
-                                    key={row.id}
+                                    key={row.nim}
                                     tabIndex={-1}
                                     selected={isItemSelected}
                                     sx={{ cursor: 'pointer' }}
@@ -301,7 +278,7 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDe
                                     <TableCell padding="checkbox">
                                         <Checkbox
                                             color="primary"
-                                            onClick={(event) => handleClick(event, row.id)}
+                                            onClick={(event) => handleClick(event, row.nim)}
                                             checked={isItemSelected}
                                             inputProps={{
                                                 'aria-labelledby': labelId,
@@ -314,12 +291,12 @@ const TableAttendanceComponent = ({ handleRowClick, handleHomewardData, handleDe
                                         scope="row"
                                         padding="none"
                                     >
-                                        {row.name}
+                                        {row.nim}
                                     </TableCell>
-                                    <TableCell align="right">{row.calories}</TableCell>
-                                    <TableCell align="right">{row.fat}</TableCell>
-                                    <TableCell align="right">{row.carbs}</TableCell>
-                                    <TableCell align="right">{row.protein}</TableCell>
+                                    <TableCell align="left">{row.nama}</TableCell>
+                                    <TableCell align="left">{row.waktu_datang}</TableCell>
+                                    <TableCell align="left">{row.waktu_pulang}</TableCell>
+                                    <TableCell align="left">{`${row.terlambat} ${language?.minutes}`}</TableCell>
                                 </TableRow>
                             )
                         })}

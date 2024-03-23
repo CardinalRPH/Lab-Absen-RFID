@@ -2,7 +2,7 @@
 import { Box, Card, CardContent, Divider, Skeleton, Typography } from "@mui/material"
 
 // eslint-disable-next-line react/prop-types
-const AttendanceRecapCard = ({ loading = false, label, language }) => {
+const AttendanceRecapCard = ({ loading = false, label, language, data }) => {
     return (
         <Card sx={{ mb: 2 }}>
             <CardContent>
@@ -10,7 +10,7 @@ const AttendanceRecapCard = ({ loading = false, label, language }) => {
                 <Box sx={{ my: 2 }}>
                     <Box sx={{ display: 'flex', bgcolor: 'divider', my: 1, py: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `15 ${label}`}</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `${data?.present} ${label}`}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
                             <Typography >{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : language?.present}</Typography>
@@ -18,7 +18,7 @@ const AttendanceRecapCard = ({ loading = false, label, language }) => {
                     </Box>
                     <Box sx={{ display: 'flex', bgcolor: 'divider', my: 1, py: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `15 ${label}`}</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `${data?.notpresent} ${label}`}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
                             <Typography >{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : language?.notpresent}</Typography>
@@ -29,7 +29,7 @@ const AttendanceRecapCard = ({ loading = false, label, language }) => {
                 <Box sx={{ my: 2 }}>
                     <Box sx={{ display: 'flex', bgcolor: 'divider', my: 1, py: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `15 ${label}`}</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `${data?.onTime} ${label}`}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
                             <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : language?.onTime}</Typography>
@@ -37,7 +37,7 @@ const AttendanceRecapCard = ({ loading = false, label, language }) => {
                     </Box>
                     <Box sx={{ display: 'flex', bgcolor: 'divider', my: 1, py: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
-                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `15 ${label}`}</Typography>
+                            <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : `${data?.late} ${label}`}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'center', width: '50%' }}>
                             <Typography>{loading ? (<Skeleton sx={{ minWidth: 100 }} />) : language?.late}</Typography>

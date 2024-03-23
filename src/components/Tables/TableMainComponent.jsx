@@ -1,37 +1,10 @@
 /* eslint-disable react/prop-types */
-import { faPenToSquare, faTrash, faUserSlash } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare, faTrash, faUserPlus, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, Checkbox, ListItemIcon, ListItemText, Menu, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, TextField, Toolbar, Typography, alpha } from "@mui/material";
 import { useMemo, useState } from "react";
 
 /* eslint-disable no-undef */
-const createData = (id, name, calories, fat, carbs, protein) => {
-    return {
-        id,
-        name,
-        calories,
-        fat,
-        carbs,
-        protein,
-    };
-}
-
-const rows = [
-    createData(1, 'Cupcake', 305, 3.7, 67, 4.3),
-    createData(2, 'Donut', 452, 25.0, 51, 4.9),
-    createData(3, 'Eclair', 262, 16.0, 24, 6.0),
-    createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData(5, 'Gingerbread', 356, 16.0, 49, 3.9),
-    createData(6, 'Honeycomb', 408, 3.2, 87, 6.5),
-    createData(7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-    createData(9, 'KitKat', 518, 26.0, 65, 7.0),
-    createData(10, 'Lollipop', 392, 0.2, 98, 0.0),
-    createData(11, 'Marshmallow', 318, 0, 81, 2.0),
-    createData(12, 'Nougat', 360, 19.0, 9, 37.0),
-    createData(13, 'Oreo', 437, 18.0, 63, 4.0),
-];
-
 const descendingComparator = (a, b, orderBy) => {
     if (b[orderBy] < a[orderBy]) {
         return -1;
@@ -60,46 +33,48 @@ const stableSort = (array, comparator) => {
     return stabilizedThis.map((el) => el[0]);
 }
 
-const headCells = [
-    {
-        id: 'name',
-        numeric: false,
-        disablePadding: true,
-        label: 'Dessert (100g serving)',
-    },
-    {
-        id: 'calories',
-        numeric: true,
-        disablePadding: false,
-        label: 'Calories',
-    },
-    {
-        id: 'fat',
-        numeric: true,
-        disablePadding: false,
-        label: 'Fat (g)',
-    },
-    {
-        id: 'carbs',
-        numeric: true,
-        disablePadding: false,
-        label: 'Carbs (g)',
-    },
-    {
-        id: 'protein',
-        numeric: true,
-        disablePadding: false,
-        label: 'Protein (g)',
-    },
-];
 
 const EnhancedTableHead = (props) => {
     // eslint-disable-next-line react/prop-types
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, language } =
         props;
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
     };
+
+    const headCells = [
+        {
+            id: 'nim',
+            numeric: false,
+            disablePadding: false,
+            label: 'NIM',
+        },
+        {
+            id: 'nama',
+            numeric: false,
+            disablePadding: false,
+            label: language?.fullName,
+        },
+        {
+            id: 'jurusan',
+            numeric: false,
+            disablePadding: false,
+            label: language?.dept,
+        },
+        {
+            id: 'jabatan',
+            numeric: false,
+            disablePadding: false,
+            label: language?.position,
+        },
+        {
+            id: 'status',
+            numeric: false,
+            disablePadding: false,
+            label: "Status",
+        },
+    ];
+
 
     return (
         <TableHead>
@@ -139,8 +114,28 @@ const EnhancedTableHead = (props) => {
     );
 }
 
-const EnhancedTableToolbar = ({ numSelected, searchChange, handleDisableData, handleDeleteData, selected, language }) => {
-    
+const checkStatus = (value, master) => {
+    const data1 = value.map(item => master.find(data => data.nim === item))
+    let aktif = 0
+    let non = 0
+
+    data1.forEach(item => {
+        if (item.status === "Aktif") {
+            aktif++
+        } else {
+            non++
+        }
+    })
+    if (aktif >= non) {
+        return "Aktif"
+    } else {
+        return "Tidak Aktif"
+    }
+
+}
+
+const EnhancedTableToolbar = ({ numSelected, searchChange, handleDisableData, handleEnableData, handleDeleteData, selected, language, data }) => {
+
 
     return (
         <Toolbar
@@ -175,10 +170,18 @@ const EnhancedTableToolbar = ({ numSelected, searchChange, handleDisableData, ha
 
             {numSelected > 0 ? (
                 <Box sx={{ display: 'flex' }}>
-                    <Button variant="contained" color="warning" sx={{ mx: 1 }} onClick={() => handleDisableData(selected)}>
-                        <FontAwesomeIcon size="lg" icon={faUserSlash} />
-                        <Typography sx={{ mx: 1 }}>{language?.disableIt}</Typography>
-                    </Button>
+                    {checkStatus(selected, data) === "Aktif" ? (
+                        <Button variant="contained" color="warning" sx={{ mx: 1 }} onClick={() => handleDisableData(selected)}>
+                            <FontAwesomeIcon size="lg" icon={faUserSlash} />
+                            <Typography sx={{ mx: 1 }}>{language?.disableIt}</Typography>
+                        </Button>
+                    ) : (
+                        <Button variant="contained" color="success" sx={{ mx: 1 }} onClick={() => handleEnableData(selected)}>
+                            <FontAwesomeIcon size="lg" icon={faUserPlus} />
+                            <Typography sx={{ mx: 1 }}>{language?.enableit}</Typography>
+                        </Button>
+                    )}
+
                     <Button variant="contained" color="error" sx={{ mx: 1 }} onClick={() => handleDeleteData(selected)}>
                         <FontAwesomeIcon size="lg" icon={faTrash} />
                         <Typography sx={{ mx: 1 }}>{language?.delete}</Typography>
@@ -186,23 +189,23 @@ const EnhancedTableToolbar = ({ numSelected, searchChange, handleDisableData, ha
                 </Box>
 
             ) : (
-                <TextField id="outlined-basic" label={language?.search} variant="standard" onChange={searchChange} />
+                <TextField id="outlined-basic" label={`${language?.search} ${language?.name}`} variant="standard" onChange={searchChange} />
             )}
         </Toolbar>
     );
 }
 
 // eslint-disable-next-line react/prop-types
-const TableMainComponent = ({ handler,  language  }) => {
+const TableMainComponent = ({ handler, language, data = [] }) => {
     // eslint-disable-next-line react/prop-types
-    const { handleDeleteData, handleDisableData, handleEditOpenModal, handleRowClick,} = handler
-    const [order, setOrder] = useState('asc');
-    const [orderBy, setOrderBy] = useState('calories');
+    const { handleDeleteData, handleDisableData, handleEnableData, handleEditOpenModal, handleRowClick, } = handler
+    const [order, setOrder] = useState('desc');
+    const [orderBy, setOrderBy] = useState('nim');
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [selectedRow, setSelectedRow] = useState(null)
-    const [tempData, setTempData] = useState(rows)
+    const [tempData, setTempData] = useState(data)
     const [pointerPosition, setPointerPosition] = useState(null)
 
     const handleRequestSort = (event, property) => {
@@ -213,7 +216,7 @@ const TableMainComponent = ({ handler,  language  }) => {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = tempData.map((n) => n.id);
+            const newSelected = tempData.map((n) => n.nim);
             setSelected(newSelected);
             return;
         }
@@ -266,14 +269,13 @@ const TableMainComponent = ({ handler,  language  }) => {
 
     const handleSearchChange = (event) => {
         const searchText = event.target.value
-        // console.log(searchText);
-        setTempData(rows.filter(item => item.name.toLowerCase().includes(searchText.toLowerCase())))
+        setTempData(data?.filter(item => item.nama.toLowerCase().includes(searchText.toLowerCase())))
     }
 
     const handleMenuOpen = (event, id) => {
         event.preventDefault()
         setPointerPosition(event.target)
-        setSelectedRow(id)
+        setSelectedRow(data?.find(item => item.nim === id))
 
     }
 
@@ -283,15 +285,19 @@ const TableMainComponent = ({ handler,  language  }) => {
     }
 
     const handleMenuDelete = () => {
-        handleDeleteData(false, selectedRow)
+        handleDeleteData(false, selectedRow?.nim)
         handleMenuClose()
     }
     const handleMenuDisable = () => {
-        handleDisableData(false, selectedRow)
+        handleDisableData(false, selectedRow?.nim)
+        handleMenuClose()
+    }
+    const handleMenuEnable = () => {
+        handleEnableData(false, selectedRow?.nim)
         handleMenuClose()
     }
     const handleMenuEdit = () => {
-        handleEditOpenModal(selectedRow)
+        handleEditOpenModal(selectedRow?.nim)
         handleMenuClose()
     }
 
@@ -304,7 +310,9 @@ const TableMainComponent = ({ handler,  language  }) => {
                 numSelected={selected.length}
                 handleDeleteData={handleDeleteData}
                 handleDisableData={handleDisableData}
+                handleEnableData={handleEnableData}
                 selected={selected}
+                data={data}
             />
             <TableContainer>
                 <Table
@@ -319,21 +327,22 @@ const TableMainComponent = ({ handler,  language  }) => {
                         onSelectAllClick={handleSelectAllClick}
                         onRequestSort={handleRequestSort}
                         rowCount={tempData.length}
+                        language={language}
                     />
                     <TableBody>
                         {visibleRows.map((row, index) => {
-                            const isItemSelected = isSelected(row.id);
+                            const isItemSelected = isSelected(row.nim);
                             const labelId = `enhanced-table-checkbox-${index}`;
 
                             return (
                                 <TableRow
                                     hover
-                                    onClick={() => handleRowClick(row.id)}
-                                    onContextMenu={(e) => handleMenuOpen(e, row.id)}
+                                    onClick={() => handleRowClick(row.nim)}
+                                    onContextMenu={(e) => handleMenuOpen(e, row.nim)}
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
-                                    key={row.id}
+                                    key={row.nim}
                                     selected={isItemSelected}
                                     sx={{ cursor: 'pointer' }}
                                 >
@@ -341,7 +350,7 @@ const TableMainComponent = ({ handler,  language  }) => {
                                     <TableCell padding="checkbox">
                                         <Checkbox
                                             color="primary"
-                                            onClick={(event) => handleClick(event, row.id)}
+                                            onClick={(event) => handleClick(event, row.nim)}
                                             checked={isItemSelected}
                                             inputProps={{
                                                 'aria-labelledby': labelId,
@@ -354,12 +363,12 @@ const TableMainComponent = ({ handler,  language  }) => {
                                         scope="row"
                                         padding="none"
                                     >
-                                        {row.name}
+                                        {row.nim}
                                     </TableCell>
-                                    <TableCell align="right">{row.calories}</TableCell>
-                                    <TableCell align="right">{row.fat}</TableCell>
-                                    <TableCell align="right">{row.carbs}</TableCell>
-                                    <TableCell align="right">{row.protein}</TableCell>
+                                    <TableCell align="left">{row.nama}</TableCell>
+                                    <TableCell align="left">{row.jurusan}</TableCell>
+                                    <TableCell align="left">{row.jabatan}</TableCell>
+                                    <TableCell align="left">{row.status}</TableCell>
                                 </TableRow>
                             );
                         })}
@@ -391,23 +400,35 @@ const TableMainComponent = ({ handler,  language  }) => {
                 onClose={handleMenuClose}
                 keepMounted
             >
-                <MenuItem onClick={handleMenuDisable}>
-                    <ListItemIcon>
-                        <FontAwesomeIcon icon={faUserSlash} />
-                    </ListItemIcon>
-                    <ListItemText primary='Nonaktifkan' />
-                </MenuItem>
+                {
+                    selectedRow?.status === "Aktif" ? (
+                        <MenuItem onClick={handleMenuDisable}>
+                            <ListItemIcon>
+                                <FontAwesomeIcon icon={faUserSlash} />
+                            </ListItemIcon>
+                            <ListItemText primary={language?.disableIt} />
+                        </MenuItem>
+                    ) : (
+                        <MenuItem onClick={handleMenuEnable}>
+                            <ListItemIcon>
+                                <FontAwesomeIcon icon={faUserPlus} />
+                            </ListItemIcon>
+                            <ListItemText primary={language?.enableit} />
+                        </MenuItem>
+                    )
+                }
+
                 <MenuItem onClick={handleMenuEdit}>
                     <ListItemIcon>
                         <FontAwesomeIcon icon={faPenToSquare} />
                     </ListItemIcon>
-                    <ListItemText primary='Edit' />
+                    <ListItemText primary={language?.edit} />
                 </MenuItem>
                 <MenuItem onClick={handleMenuDelete}>
                     <ListItemIcon>
                         <FontAwesomeIcon icon={faTrash} />
                     </ListItemIcon>
-                    <ListItemText primary='Delete' />
+                    <ListItemText primary={language?.delete} />
                 </MenuItem>
             </Menu>
         </Box>

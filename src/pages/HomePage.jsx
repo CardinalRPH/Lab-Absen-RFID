@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Box, Card, CardContent, Container, Typography } from "@mui/material"
 import MediumCard from "../components/Cards/MediumCard"
 import ExportCard from "../components/Cards/ExportCard"
-import { chartData, homedata } from "../data/dummyData"
 import TabsChartComponent from "../components/TabsChartComponent"
 import { useEffect, useState } from "react"
 import ModalMain from "../components/Modals/ModalMain"
@@ -12,18 +11,37 @@ import { useNavigate } from "react-router-dom"
 import ExportRenderModal from "../components/Modals/ExportRenderModal"
 import { useSelector } from "react-redux"
 import { enLang, idLang } from "../utilities/LanguageTextConfig"
+import { useGet } from "../hooks/dataHandler"
 
 const HomePage = () => {
-    const [loading, setLoading] = useState(false)
     const [modalOpen, setModalOpen] = useState(false)
     const [modalTitle, setModalTitle] = useState('')
     const { isEnLang } = useSelector(state => state.languages)
     const language = isEnLang ? enLang : idLang
-    const serverDate = Date.now()
+    const { timeStamp } = useSelector(state => state.cTimeStamp)
+    const [serverTime, setServerTime] = useState(Date.now())
+
+    const { data: data1, loading: loading1 = true, error: error1 } = useGet("assistant")
+    const { data: data2, loading: loading2, error: error2 } = useGet("attendance")
+    const { data: data3, loading: loading3, error: error3 } = useGet("leave")
+
+    const [assistantData, setAssistantData] = useState({
+        assistant: "",
+        calas: "",
+    })
+    const [attendanceData, setAttendanceData] = useState({
+        assistant: "",
+        calas: "",
+    })
+    const [leaveData, setLeaveData] = useState({
+        assistant: "",
+        calas: "",
+    })
+
     const navigate = useNavigate()
     const [dateRangeVal, setDateRangeVal] = useState({
-        dateRange1: moment(serverDate),
-        dateRange2: moment(serverDate)
+        dateRange1: moment(serverTime),
+        dateRange2: moment(serverTime)
     })
     const [radioReportVal, setRadioReportVal] = useState('')
 
@@ -61,6 +79,45 @@ const HomePage = () => {
     }
 
     useEffect(() => {
+        if (timeStamp) {
+            setServerTime(new Date(timeStamp))
+        }
+    }, [timeStamp])
+
+    useEffect(() => {
+        if (data1) {
+            setAssistantData({
+                assistant: data1?.data.filter(item => item.jabatan !== "Calon Asisten" && item.status === "Aktif").length,
+                calas: data1?.data.filter(item => item.jabatan === "Calon Asisten" && item.status === "Aktif").length,
+            })
+        }
+        if (error1) {
+            console.log(error1);
+        }
+
+        if (data2) {
+            setAttendanceData({
+                assistant: data2?.data.filter(item => item.jabatan !== "Calon Asisten" && item.waktu_datang !== null).length,
+                calas: data2?.data.filter(item => item.jabatan === "Calon Asisten" && item.waktu_datang !== null).length
+            })
+        }
+        if (error2) {
+            console.log(error2);
+        }
+
+        if (data3) {
+            setLeaveData({
+                assistant: data3?.data.filter(item => item.jabatan !== "Calon Asisten" && item.tanggal_izin !== null).length,
+                calas: data3?.data.filter(item => item.jabatan === "Calon Asisten" && item.tanggal_izin !== null).length
+            })
+        }
+        if (error3) {
+            console.log(error3);
+        }
+
+    }, [data1, data2, data3, error1, error2, error3])
+
+    useEffect(() => {
         document.title = `${language?.home} - Lab ICT Presensi`
     }, [language?.home])
 
@@ -70,37 +127,37 @@ const HomePage = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', width: '100%', justifyContent: 'center' }}>
                     <MediumCard
                         purpose='single'
-                        data={homedata.jumlah_asisten_aktif}
+                        data={assistantData.assistant}
                         title={language?.totalActiveassistant}
                         sub1={language?.assistant}
-                        loading={loading}
+                        loading={loading1}
                     />
                     <MediumCard
                         purpose='single'
-                        data={homedata.jumlah_calon_asisten_aktif}
+                        data={assistantData.calas}
                         title={language?.totalActiveCalas}
                         sub1={language?.calas_l}
-                        loading={loading}
+                        loading={loading1}
                     />
                     <MediumCard
                         purpose='double'
-                        data={homedata.jumlah_presensi}
+                        data={attendanceData}
                         title={language?.totalAtdnow}
                         sub1={language?.assistant}
                         sub2={language?.calas_l}
-                        path1={(data) => data.asisten}
-                        path2={(data) => data.calon_asisten}
-                        loading={loading}
+                        path1={(data) => data?.assistant}
+                        path2={(data) => data?.calas}
+                        loading={loading2}
                     />
                     <MediumCard
                         purpose='double'
-                        data={homedata.jumlah_izin}
+                        data={leaveData}
                         title={language?.totalAbsentNow}
                         sub1={language?.assistant}
                         sub2={language?.calas_l}
-                        path1={(data) => data.asisten}
-                        path2={(data) => data.calon_asisten}
-                        loading={loading}
+                        path1={(data) => data.assistant}
+                        path2={(data) => data.calas}
+                        loading={loading3}
                     />
 
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -117,7 +174,7 @@ const HomePage = () => {
                     </Box>
                     <Card sx={{ width: '100%', margin: 2 }}>
                         <CardContent>
-                            <TabsChartComponent language={language} loading={loading} data={chartData} />
+                            <TabsChartComponent language={language} loading={loading1} data={data1?.data} />
                         </CardContent>
                     </Card>
 

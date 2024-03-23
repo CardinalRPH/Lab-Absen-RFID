@@ -37,7 +37,7 @@ export const chartData = {
         total: 69
     },
     fakultas: {
-        fti: {
+        fakultas_teknologi_informasi: {
             data: [
                 {
                     name: 'Fakultas Teknologi Informasi',
@@ -47,7 +47,7 @@ export const chartData = {
                 }
             ]
         },
-        fe: {
+        fakultas_ekonomi: {
             data: [
                 {
                     name: 'Fakultas Ekonomi',
@@ -56,7 +56,7 @@ export const chartData = {
                 }
             ]
         },
-        ft: {
+        fakultas_teknik: {
             data: [
                 {
                     name: 'Fakultas Teknik',
@@ -65,7 +65,7 @@ export const chartData = {
                 }
             ]
         },
-        fisip: {
+        fakultas_ilmu_sosial_dan_ilmu_politik: {
             data: [
                 {
                     name: 'Fakultas Ilmu Sosial & Politik',

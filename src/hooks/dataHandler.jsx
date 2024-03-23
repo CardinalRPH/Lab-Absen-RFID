@@ -1,39 +1,88 @@
 import useAxios from "axios-hooks"
+import { httpURI } from "../config/originConfig"
 
-const BASE_URL = "#"
+const BASE_URL = httpURI
 
 export const usePost = (url, manual = true) => {
-    const [{ data, loading, error }, execute] = useAxios(
-        { url: `${BASE_URL}/${url}`, method: "POST" },
+    const [{ data, loading, error, response }, execute] = useAxios({
+        url: `${BASE_URL}/${url}`,
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Access-Control-Allow-Credentials": true
+        },
+        withCredentials: true
+    },
         { manual },
     )
 
-    return { data, loading, error, execute }
+    return { data, loading, error, execute, response }
 }
 
 export const usePut = (url, manual = true) => {
-    const [{ data, loading, error }, execute] = useAxios(
-        { url: `${BASE_URL}/${url}`, method: "PUT" },
+    const [{ data, loading, error, response }, execute] = useAxios({
+        url: `${BASE_URL}/${url}`,
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Access-Control-Allow-Credentials": true
+        },
+        withCredentials: true
+    },
         { manual },
     )
 
-    return { data, loading, error, execute }
+    return { data, loading, error, execute, response }
 }
 
-export const useGet = (url) => {
-    const [{ data, loading, error }, execute] = useAxios({
+export const useDelete = (url, manual = true) => {
+    const [{ data, loading, error, response }, execute] = useAxios({
+        url: `${BASE_URL}/${url}`,
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Access-Control-Allow-Credentials": true
+        },
+        withCredentials: true
+    },
+        { manual },
+    )
+
+    return { data, loading, error, execute, response }
+}
+
+export const useGet = (url, manual = false) => {
+    const [{ data, loading, error, response }, execute] = useAxios({
         url: `${BASE_URL}/${url}`,
         method: "GET",
-    })
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Access-Control-Allow-Credentials": true
+        },
+        withCredentials: true
+    },
+        { manual }
+    )
 
-    return { data, loading, error, execute }
+    return { data, loading, error, execute, response }
 }
 
-export const useGetById = (url, manual = true) => {
-    const [{ data, loading, error }, execute] = useAxios(
-        { url: `${BASE_URL}/${url}`, method: "GET" },
+export const useGetByParam = (url, manual = true) => {
+    const [{ data, loading, error, response }, execute] = useAxios({
+        url: `${BASE_URL}/${url}`,
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Access-Control-Allow-Credentials": true
+        }
+    },
         { manual },
     )
 
-    return { data, loading, error, execute }
+    return { data, loading, error, execute, response }
 }

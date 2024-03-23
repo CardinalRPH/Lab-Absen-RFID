@@ -8,7 +8,9 @@ import ExportPriviewPage from "../pages/ExportPriviewPage";
 import RFIDDevicesPage from "../pages/RFIDDevicesPage";
 import AuthGuard from "../services/AuthGuard";
 import AbsentPage from "../pages/AbsentPage";
+import NotFound404Page from "../pages/NotFound404Page";
 
+//Need 404 Not Found Page
 const AppRouter = createBrowserRouter([
     {
         path: '/',
@@ -61,6 +63,10 @@ const AppRouter = createBrowserRouter([
             {
                 path: 'absent',
                 element: <AbsentPage />
+            },
+            {
+                path: '*',
+                element: <NotFound404Page />
             }
         ]
     }
